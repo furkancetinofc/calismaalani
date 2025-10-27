@@ -1,31 +1,74 @@
 // **********************************************
-// ********* API VE VERİ TABANI AYARLARI *********
+// ********* API VE HARCIRAH VERİ TABANI *********
 // **********************************************
 
-// Harcırahların Sabit Veri Tabanı (Örnek veriler kullanılmıştır)
+// Sizin sağladığınız tabloya göre oluşturulan harcırah değerleri (tekil harcırah tutarları)
 const harcirahVerileri = {
-    "ABD": { tam: 150, kismi: 112.5, birim: "USD" },
-    "Almanya": { tam: 120, kismi: 90, birim: "EUR" },
-    "Japonya": { tam: 18000, kismi: 13500, birim: "JPY" },
-    "Fransa": { tam: 125, kismi: 93.75, birim: "EUR" },
-    // Lütfen KENDİ GÜNCEL VE TAM LISTENIZLE DOLDURUNUZ.
+    // Para Birimi: USD (ABD Doları)
+    "ABD": { deger: 74, birim: "USD", dovizAdi: "$" },
+    "DİĞER ÜLKELER": { deger: 64, birim: "USD", dovizAdi: "$" },
+
+    // Para Birimi: EUR (Euro)
+    "AVUSTURYA": { deger: 68, birim: "EUR", dovizAdi: "€" },
+    "ALMANYA": { deger: 67, birim: "EUR", dovizAdi: "€" },
+    "BELÇİKA": { deger: 66, birim: "EUR", dovizAdi: "€" },
+    "LÜKSEMBURG": { deger: 66, birim: "EUR", dovizAdi: "€" },
+    "FİNLANDİYA": { deger: 60, birim: "EUR", dovizAdi: "€" },
+    "FRANSA": { deger: 65, birim: "EUR", dovizAdi: "€" },
+    "HOLLANDA": { deger: 64, birim: "EUR", dovizAdi: "€" },
+    "İTALYA": { deger: 62, birim: "EUR", dovizAdi: "€" },
+    "PORTEKİZ": { deger: 63, birim: "EUR", dovizAdi: "€" },
+    "YUNANİSTAN": { deger: 64, birim: "EUR", dovizAdi: "€" },
+    "İRLANDA": { deger: 63, birim: "EUR", dovizAdi: "€" },
+    "DİĞER AB ÜLKELERİ": { deger: 52, birim: "EUR", dovizAdi: "€" },
+
+    // Para Birimi: AUD (Avustralya Doları)
+    "AVUSTRALYA": { deger: 115, birim: "AUD", dovizAdi: "A$" },
+
+    // Para Birimi: DKK (Danimarka Kronu)
+    "DANİMARKA": { deger: 505, birim: "DKK", dovizAdi: "kr" },
+
+    // Para Birimi: SEK (İsveç Kronu)
+    "İSVEÇ": { deger: 553, birim: "SEK", dovizAdi: "kr" },
+
+    // Para Birimi: CHF (İsviçre Frangı)
+    "İSVİÇRE": { deger: 74, birim: "CHF", dovizAdi: "CHF" },
+
+    // Para Birimi: JPY (Japon Yeni)
+    "JAPONYA": { deger: 8680, birim: "JPY", dovizAdi: "¥" },
+
+    // Para Birimi: CAD (Kanada Doları)
+    "KANADA": { deger: 100, birim: "CAD", dovizAdi: "C$" },
+
+    // Para Birimi: KWD (Kuveyt Dinarı)
+    "KUVEYT": { deger: 21, birim: "KWD", dovizAdi: "KD" },
+
+    // Para Birimi: NOK (Norveç Kronu)
+    "NORVEÇ": { deger: 486, birim: "NOK", dovizAdi: "kr" },
+
+    // Para Birimi: GBP (İngiliz Sterlini)
+    "İNGİLTERE": { deger: 47, birim: "GBP", dovizAdi: "£" },
+
+    // Para Birimi: SAR (Suudi Arabistan Riyali)
+    "S.ARABİSTAN": { deger: 252, birim: "SAR", dovizAdi: "﷼" },
 };
 
-// YENİ: DÖVİZ KURU API ENTEGRASYONU
-const API_KEY = 'SİZİN_ALDIĞINIZ_API_ANAHTARI'; // <<< LÜTFEN KENDİ ANAHTARINIZI BURAYA YAPIŞTIRIN!
+// Döviz Kuru API
+const API_KEY = '87e420cb67c7d1e9f4f2aa5c'; 
 const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
+// Kur verilerini 
 let kurVerileri = {
-    "USD": 0,
-    "EUR": 0,
-    "JPY": 0, 
-    // Varsayılan kurlar (hata durumunda kullanılacak tahmini değerler)
-    "DEFAULT_USD": 30.00,
-    "DEFAULT_EUR": 32.00,
-    "DEFAULT_JPY": 0.20
+    "USD": 0, "EUR": 0, "JPY": 0, "AUD": 0, "DKK": 0, 
+    "SEK": 0, "CHF": 0, "CAD": 0, "KWD": 0, "NOK": 0, "GBP": 0, "SAR": 0,
+    // DEFAULT 
+    "DEFAULT_USD": 30.00, "DEFAULT_EUR": 32.00, "DEFAULT_JPY": 0.20, 
+    "DEFAULT_AUD": 18.00, "DEFAULT_DKK": 4.20, "DEFAULT_SEK": 3.00, 
+    "DEFAULT_CHF": 34.00, "DEFAULT_CAD": 21.00, "DEFAULT_KWD": 98.00, 
+    "DEFAULT_NOK": 2.90, "DEFAULT_GBP": 37.00, "DEFAULT_SAR": 8.00
 };
 
-// API'den kurları çeken asenkron fonksiyon
+// API asenkron 
 async function kurlariGetir() {
     try {
         const response = await fetch(BASE_URL);
@@ -35,28 +78,35 @@ async function kurlariGetir() {
             throw new Error(`API Hatası: ${data['error-type']}`);
         }
 
-        // 1 Para Birimi = X TL (Conversion rate'in tersi)
-        if (data.conversion_rates.USD) kurVerileri.USD = 1 / data.conversion_rates.USD;
-        if (data.conversion_rates.EUR) kurVerileri.EUR = 1 / data.conversion_rates.EUR;
-        if (data.conversion_rates.JPY) kurVerileri.JPY = 1 / data.conversion_rates.JPY;
+        // 1 Para Birimi = X TL 
+        const rates = data.conversion_rates;
+        for (const birim in kurVerileri) {
+            if (rates[birim]) {
+                kurVerileri[birim] = 1 / rates[birim];
+            }
+        }
+        console.log("Güncel Kurlar yüklendi:", kurVerileri);
 
     } catch (error) {
         console.error("Döviz Kuru API Hatası:", error);
-        // Hata durumunda varsayılan kurlar kullanılıyor.
-        kurVerileri.USD = kurVerileri.DEFAULT_USD;
-        kurVerileri.EUR = kurVerileri.DEFAULT_EUR;
-        kurVerileri.JPY = kurVerileri.DEFAULT_JPY;
+        
+        for (const birim in kurVerileri) {
+            if (birim.startsWith('DEFAULT_')) {
+                const actualBirim = birim.substring(8);
+                kurVerileri[actualBirim] = kurVerileri[birim];
+            }
+        }
         console.log("Varsayılan kurlar kullanılıyor (Hata Durumu).");
     }
 }
 
 
-// YENİ: ÜLKE SEÇİMİNİ DOLDURAN FONKSİYON
+// Ülke Seçimi Fonksiyonu
 function ulkeSecimleriniDoldur() {
     const ulkeSecimiSelect = document.getElementById('ulkeSecimi');
     if (!ulkeSecimiSelect) return;
 
-    // Harcirah verilerindeki ülkeleri alıp option olarak ekliyoruz
+    // Harcırah option
     Object.keys(harcirahVerileri).sort().forEach(ulke => {
         const option = document.createElement('option');
         option.value = ulke;
@@ -67,7 +117,7 @@ function ulkeSecimleriniDoldur() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Kurları Getir (API Çağrısı) ve Ülke Seçim Kutusunu Doldur
+    
     kurlariGetir();
     ulkeSecimleriniDoldur();
     
@@ -77,13 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const tabCalismaBtn = document.getElementById('tabCalismaBtn');
     const tabHaricrahBtn = document.getElementById('tabHaricrahBtn');
-    const tabDegerBtn = document.getElementById('tabDegerBtn'); // Yeni buton
+    const tabDegerBtn = document.getElementById('tabDegerBtn'); 
     
     const calismaGunTab = document.getElementById('calismaGunTab');
     const haricrahTab = document.getElementById('haricrahTab');
-    const degerHesaplayiciTab = document.getElementById('degerHesaplayiciTab'); // Yeni sekme
+    const degerHesaplayiciTab = document.getElementById('degerHesaplayiciTab');
 
-    // Güvenlik Kontrolü: Sekme elementleri varsa dinleyicileri ekle
     if (tabCalismaBtn && tabHaricrahBtn && calismaGunTab && haricrahTab && tabDegerBtn && degerHesaplayiciTab) {
         const allTabs = [calismaGunTab, haricrahTab, degerHesaplayiciTab];
         const allBtns = [tabCalismaBtn, tabHaricrahBtn, tabDegerBtn];
@@ -105,7 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ***************************************************
     // ********* 1. BOŞ GÜN HESAPLAYICISI MANTIĞI *********
     // ***************************************************
-
+    
+    // Boş Gün Tablosu
     const bosGunTablosu = { 
         31: 8, 30: 8, 29: 8, 28: 7, 27: 7, 26: 7, 25: 7, 
         24: 6, 23: 6, 22: 6, 21: 6, 20: 5, 19: 5, 
@@ -127,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const hesaplaBtn = document.getElementById('hesaplaBtn');
     const sonucDiv = document.getElementById('sonuc');
     
-    // Güvenlik Kontrolü: Buton varsa dinleyiciyi ekle
     if (hesaplaBtn) {
         hesaplaBtn.addEventListener('click', hesaplaBoşGün);
     }
@@ -229,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let zamanAciklamasi;
 
             if (N === 1) {
+                // 1 Harcırah: 24 saat 00 dakikayı DAHİL EDEN bitiş anı (ve öncesi)
                 const yirmiDortSaatMs = 24 * 60 * 60 * 1000;
                 const bitisSuresiMs = baslangicSuresiMs + yirmiDortSaatMs;
                 
@@ -236,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 zamanAciklamasi = "ve öncesi";
 
             } else {
+                // N Harcırah: (N-1) tam gün + 1 dakika EŞİĞİNİ GEÇEN BAŞLANGIÇ ANLARI (ve sonrası)
                 const gunMs = (N - 1) * 24 * 60 * 60 * 1000;
                 const birDakikaMs = 1 * 60 * 1000;
 
@@ -274,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ***************************************************
     
     const ulkeSecimiSelect = document.getElementById('ulkeSecimi');
+    const harcirahSayisiInput = document.getElementById('harcirahSayisi');
     const hesaplaDegerBtn = document.getElementById('hesaplaDegerBtn');
     const degerSonucDiv = document.getElementById('degerSonuc');
 
@@ -282,39 +334,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hesaplaHaricrahDeger() {
-        if (!ulkeSecimiSelect || !degerSonucDiv) return;
+        if (!ulkeSecimiSelect || !harcirahSayisiInput || !degerSonucDiv) return;
         
-        const harcirahTipiInput = document.querySelector('input[name="harcirahTipi"]:checked');
+        const secilenUlke = ulkeSecimiSelect.value;
+        const harcirahSayisi = parseInt(harcirahSayisiInput.value);
 
-        if (!ulkeSecimiSelect.value || !harcirahTipiInput) {
-            degerSonucDiv.innerHTML = "Lütfen bir ülke seçimi yapınız ve harcırah tipini belirtiniz.";
+        if (!secilenUlke || isNaN(harcirahSayisi) || harcirahSayisi < 1) {
+            degerSonucDiv.innerHTML = "Lütfen bir ülke seçimi yapınız ve harcırah gün sayınızı giriniz.";
             degerSonucDiv.className = 'sonuc-kutusu error';
             return;
         }
-
-        const secilenUlke = ulkeSecimiSelect.value;
-        const harcirahTipi = harcirahTipiInput.value;
         
         const veri = harcirahVerileri[secilenUlke];
-        const originalTutar = veri[harcirahTipi];
+        const tekilDeger = veri.deger;
         const paraBirimi = veri.birim;
+        const dovizAdi = veri.dovizAdi;
         
         // Kur bilgisini al (kurVerileri objesinden)
-        const kur = kurVerileri[paraBirimi] || kurVerileri[`DEFAULT_${paraBirimi}`] || 1; // Kur yoksa varsayılana düş, o da yoksa 1
+        // Kur yoksa varsayılan kura düş, o da yoksa 1
+        let kur = kurVerileri[paraBirimi]; 
+        if (!kur || kur === 0) {
+            kur = kurVerileri[`DEFAULT_${paraBirimi}`] || 1;
+            console.warn(`Uyarı: ${paraBirimi} için canlı kur bulunamadı, varsayılan kur (${kur}) kullanılıyor.`);
+        }
         
-        const tlKarsiligi = originalTutar * kur;
+        // Hesaplamalar
+        const totalOriginalTutar = tekilDeger * harcirahSayisi;
+        const tlKarsiligi = totalOriginalTutar * kur;
 
+        // Formatlama
         const kurBilgisiStr = kur.toFixed(4).replace('.', ','); // 4 ondalıklı ve Türkçe format
         const tlKarsiligiStr = tlKarsiligi.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const originalTutarStr = originalTutar.toLocaleString('tr-TR');
+        const totalOriginalTutarStr = totalOriginalTutar.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
         // Sonuç Çıktısı
         degerSonucDiv.innerHTML = `
-            <h3>${secilenUlke} - ${harcirahTipi === 'tam' ? 'Tam Gün' : 'Kısmi Gün'} Harcırah Değeri</h3>
-            <p style="font-size: 1.1em;">Orijinal Tutar: <strong>${originalTutarStr} ${paraBirimi}</strong></p>
-            <p style="font-size: 1.1em; color: #004d99;">Güncel Kur (${paraBirimi}/TL): <strong>1 ${paraBirimi} = ${kurBilgisiStr} TL</strong></p>
+            <h3>${secilenUlke} İçin ${harcirahSayisi} Harcırah Değeri</h3>
+            <p style="font-size: 1.1em;">
+                Orijinal Tutar: 
+                <strong>${totalOriginalTutarStr} ${dovizAdi}</strong> 
+                <span style="font-size:0.8em; color:#666;">(${tekilDeger}${dovizAdi} x ${harcirahSayisi})</span>
+            </p>
+            <p style="font-size: 1.1em; color: #004d99;">
+                Güncel Kur (${paraBirimi}/TL): 
+                <strong>1 ${paraBirimi} = ${kurBilgisiStr} TL</strong>
+            </p>
             <hr style="border-top: 1px solid #ccc; width: 80%; margin: 15px auto;">
-            <p style="font-size: 1.8em; color: #cc0000;">TL Karşılığı: <strong>${tlKarsiligiStr} TL</strong></p>
+            <p style="font-size: 1.8em; color: #cc0000;">
+                Toplam TL Karşılığı: 
+                <strong>${tlKarsiligiStr} TL</strong>
+            </p>
+            <p style="font-size: 0.8em; color: #999; margin-top: 10px;">
+                *Kur verisi ExchangeRate-API tarafından sağlanmıştır.
+            </p>
         `;
         degerSonucDiv.className = 'sonuc-kutusu';
     }
