@@ -5,52 +5,52 @@
 // Sizin sağladığınız tabloya göre oluşturulan harcırah değerleri (tekil harcırah tutarları)
 const harcirahVerileri = {
     // Para Birimi: USD (ABD Doları)
-    "ABD": { deger: 74, birim: "USD", dovizAdi: "$" },
+    "ABD": { deger: 60, birim: "USD", dovizAdi: "$" },
     "DİĞER ÜLKELER": { deger: 64, birim: "USD", dovizAdi: "$" },
 
     // Para Birimi: EUR (Euro)
-    "AVUSTURYA": { deger: 68, birim: "EUR", dovizAdi: "€" },
-    "ALMANYA": { deger: 67, birim: "EUR", dovizAdi: "€" },
-    "BELÇİKA": { deger: 66, birim: "EUR", dovizAdi: "€" },
-    "LÜKSEMBURG": { deger: 66, birim: "EUR", dovizAdi: "€" },
-    "FİNLANDİYA": { deger: 60, birim: "EUR", dovizAdi: "€" },
-    "FRANSA": { deger: 65, birim: "EUR", dovizAdi: "€" },
-    "HOLLANDA": { deger: 64, birim: "EUR", dovizAdi: "€" },
-    "İTALYA": { deger: 62, birim: "EUR", dovizAdi: "€" },
-    "PORTEKİZ": { deger: 63, birim: "EUR", dovizAdi: "€" },
-    "YUNANİSTAN": { deger: 64, birim: "EUR", dovizAdi: "€" },
-    "İRLANDA": { deger: 63, birim: "EUR", dovizAdi: "€" },
-    "DİĞER AB ÜLKELERİ": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "AVUSTURYA": { deger: 55, birim: "EUR", dovizAdi: "€" },
+    "ALMANYA": { deger: 54, birim: "EUR", dovizAdi: "€" },
+    "BELÇİKA": { deger: 53, birim: "EUR", dovizAdi: "€" },
+    "LÜKSEMBURG": { deger: 54, birim: "EUR", dovizAdi: "€" },
+    "FİNLANDİYA": { deger: 48, birim: "EUR", dovizAdi: "€" },
+    "FRANSA": { deger: 53, birim: "EUR", dovizAdi: "€" },
+    "HOLLANDA": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "İTALYA": { deger: 50, birim: "EUR", dovizAdi: "€" },
+    "PORTEKİZ": { deger: 51, birim: "EUR", dovizAdi: "€" },
+    "YUNANİSTAN": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "İRLANDA": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "DİĞER AB ÜLKELERİ": { deger: 42, birim: "EUR", dovizAdi: "€" },
 
     // Para Birimi: AUD (Avustralya Doları)
-    "AVUSTRALYA": { deger: 115, birim: "AUD", dovizAdi: "A$" },
+    "AVUSTRALYA": { deger: 93, birim: "AUD", dovizAdi: "A$" },
 
     // Para Birimi: DKK (Danimarka Kronu)
-    "DANİMARKA": { deger: 505, birim: "DKK", dovizAdi: "kr" },
+    "DANİMARKA": { deger: 408, birim: "DKK", dovizAdi: "kr" },
 
     // Para Birimi: SEK (İsveç Kronu)
-    "İSVEÇ": { deger: 553, birim: "SEK", dovizAdi: "kr" },
+    "İSVEÇ": { deger: 447, birim: "SEK", dovizAdi: "kr" },
 
     // Para Birimi: CHF (İsviçre Frangı)
-    "İSVİÇRE": { deger: 74, birim: "CHF", dovizAdi: "CHF" },
+    "İSVİÇRE": { deger: 60, birim: "CHF", dovizAdi: "CHF" },
 
     // Para Birimi: JPY (Japon Yeni)
-    "JAPONYA": { deger: 8680, birim: "JPY", dovizAdi: "¥" },
+    "JAPONYA": { deger: 7000, birim: "JPY", dovizAdi: "¥" },
 
     // Para Birimi: CAD (Kanada Doları)
-    "KANADA": { deger: 100, birim: "CAD", dovizAdi: "C$" },
+    "KANADA": { deger: 81, birim: "CAD", dovizAdi: "C$" },
 
     // Para Birimi: KWD (Kuveyt Dinarı)
-    "KUVEYT": { deger: 21, birim: "KWD", dovizAdi: "KD" },
+    "KUVEYT": { deger: 16, birim: "KWD", dovizAdi: "KD" },
 
     // Para Birimi: NOK (Norveç Kronu)
-    "NORVEÇ": { deger: 486, birim: "NOK", dovizAdi: "kr" },
+    "NORVEÇ": { deger: 393, birim: "NOK", dovizAdi: "kr" },
 
     // Para Birimi: GBP (İngiliz Sterlini)
-    "İNGİLTERE": { deger: 47, birim: "GBP", dovizAdi: "£" },
+    "İNGİLTERE": { deger: 38, birim: "GBP", dovizAdi: "£" },
 
     // Para Birimi: SAR (Suudi Arabistan Riyali)
-    "S.ARABİSTAN": { deger: 252, birim: "SAR", dovizAdi: "﷼" },
+    "S.ARABİSTAN": { deger: 204, birim: "SAR", dovizAdi: "﷼" },
 };
 
 // Döviz Kuru API
