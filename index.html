@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uçucu Ekip Hesaplayıcıları</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <div class="tab-buttons">
+            <button id="tabCalismaBtn" class="active">Boş Gün Hesaplayıcı</button>
+            <button id="tabHaricrahBtn">Harcırah Planlayıcı</button>
+            <button id="tabDegerBtn">Harcırah Değer Hesaplayıcı</button> </div>
+
+        <div id="calismaGunTab" class="tab-content">
+            <h1>Boş Gün Hesaplayıcı</h1>
+            <p class="description">Ay seçiminize ve rapor/mazeret izinlerinize göre hak ettiğiniz "Kullanılabilecek Boş Gün" sayısını hesaplar.</p>
+
+            <div class="input-group">
+                <label for="aySecimi">Hesaplama Yapılacak Ayı Seçiniz:</label>
+                <select id="aySecimi" required>
+                    <option value="">-- Ay Seçiniz --</option>
+                    <option value="Ocak">Ocak (31)</option>
+                    <option value="Subat">Şubat (29/28)</option>
+                    <option value="Mart">Mart (31)</option>
+                    <option value="Nisan">Nisan (30)</option>
+                    <option value="Mayis">Mayıs (31)</option>
+                    <option value="Haziran">Haziran (30)</option>
+                    <option value="Temmuz">Temmuz (31)</option>
+                    <option value="Agustos">Ağustos (31)</option>
+                    <option value="Eylul">Eylül (30)</option>
+                    <option value="Ekim">Ekim (31)</option>
+                    <option value="Kasim">Kasım (30)</option>
+                    <option value="Aralik">Aralık (31)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="izinGunSayisi">Ay İçinde Alınan Toplam Rapor/Mazeret İzni (Gün):</label>
+                <input type="number" id="izinGunSayisi" placeholder="Örn: 2" min="0" required>
+            </div>
+            
+            <button id="hesaplaBtn">Boş Gün Hakkını Hesapla</button>
+            
+            <div id="sonuc" class="sonuc-kutusu"></div>
+            
+            <p class="not">
+                *Hesaplama, THY A.O. Uçucu Ekipler Takvim Ayında Çalışılan Gün ve Kullanılabilecek Boş Gün Oran Tablosu (EK-5) baz alınarak yapılmıştır.
+            </p>
+        </div>
+
+        <div id="haricrahTab" class="tab-content hidden">
+            <h1>Harcırah Planlayıcı</h1>
+            <p class="description">Motor kapama saatinize göre, hangi saatte Pushback yapma durumunda kaç harcırah alacağınızı garantileyecek minimum dönüş (Pushback) saatlerini planlayın (UTC).</p>
+
+            <div class="input-group">
+                <label for="motorKapamaZamani">Motor Kapama Zamanı (UTC Tarih ve Saat):</label>
+                <input type="datetime-local" id="motorKapamaZamani" required>
+            </div>
+            
+            <button id="planlaHaricrahBtn">Harcırah Planını Göster</button>
+
+            <div id="haricrahSonuc" class="sonuc-kutusu" style="text-align: left;">
+                Lütfen Motor Kapama Zamanını giriniz.
+            </div>
+        </div>
+        
+        <div id="degerHesaplayiciTab" class="tab-content hidden">
+            <h1>Harcırah Değer Hesaplayıcı</h1>
+            <p class="description">Gidilen ülkeye ve harcırah tipine göre harcırahınızın orijinal tutarını ve güncel TL karşılığını anlık kur üzerinden hesaplar.</p>
+
+            <div class="input-group">
+                <label for="ulkeSecimi">Gidilen Ülke:</label>
+                <select id="ulkeSecimi" required>
+                    <option value="">-- Ülke Seçiniz --</option>
+                    </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Harcırah Tipi:</label>
+                <div class="radio-group">
+                    <input type="radio" id="tamGun" name="harcirahTipi" value="tam" checked>
+                    <label for="tamGun">Tam Gün (24 Saat üzeri)</label>
+                    <input type="radio" id="kismiGun" name="harcirahTipi" value="kismi">
+                    <label for="kismiGun">Kısmi Gün (6-24 Saat arası)</label>
+                </div>
+            </div>
+            
+            <button id="hesaplaDegerBtn" class="mavi-btn">Güncel TL Karşılığını Hesapla</button>
+
+            <div id="degerSonuc" class="sonuc-kutusu" style="text-align: left;">
+                Lütfen bir ülke seçiniz ve hesaplama yapınız.
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
