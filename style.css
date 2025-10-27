@@ -1,0 +1,205 @@
+/* Genel Ayarlar ve Sıfırlamalar */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ebee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Ana Konteyner */
+.container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 600px;
+    box-sizing: border-box;
+    padding: 0; 
+}
+
+/* Başlıklar ve Açıklamalar */
+h1 {
+    text-align: center;
+    color: #004d99; /* Kurumsal Mavi */
+    margin-bottom: 10px;
+    font-size: 1.8em;
+}
+
+h2 {
+    color: #333;
+    font-size: 1.4em;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.9em;
+}
+
+/* Giriş Grupları ve Alanları */
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="number"], 
+input[type="datetime-local"], 
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px; /* Köşeleri Yuvarlama */
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #004d99;
+    outline: none;
+}
+
+/* Radyo Buton Grubu Stili */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.radio-group label {
+    font-weight: normal;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+
+/* Butonlar */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff9900; /* Turuncu (Boş Gün varsayılan) */
+    color: white;
+    border: none;
+    border-radius: 6px; /* Köşeleri Yuvarlama */
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #e68a00;
+}
+
+/* Harcırah Planlayıcı/Değer Butonları için Mavi Ton */
+#planlaHaricrahBtn, #hesaplaDegerBtn {
+    background-color: #004d99;
+}
+
+#planlaHaricrahBtn:hover, #hesaplaDegerBtn:hover {
+    background-color: #003a73;
+}
+
+/* Sonuç Kutusu */
+.sonuc-kutusu {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: 2px dashed #004d99;
+    min-height: 25px;
+    color: #004d99;
+    background-color: #f0f8ff;
+}
+
+.error {
+    background-color: #ffdddd;
+    color: #cc0000;
+    border: 2px solid #cc0000;
+}
+
+.not {
+    margin-top: 20px;
+    font-size: 0.8em;
+    color: #999;
+    text-align: center;
+}
+
+/* Tablo Stilleri (Harcırah Sonucu İçin) */
+.sonuc-kutusu table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 1em;
+}
+
+.sonuc-kutusu th, 
+.sonuc-kutusu td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.sonuc-kutusu th {
+    background-color: #e6f0ff;
+    color: #004d99;
+    border-bottom: 2px solid #004d99;
+}
+
+/* Sekme Stilleri */
+.tab-buttons {
+    display: flex;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-buttons button {
+    flex-grow: 1;
+    padding: 15px;
+    border-radius: 0;
+    background-color: #f0f0f0;
+    border-bottom: 3px solid transparent;
+    font-size: 1.0em;
+    color: #333;
+    margin-top: 0;
+    font-weight: 500;
+}
+
+.tab-buttons button.active {
+    background-color: #ffffff;
+    border-bottom: 3px solid #004d99;
+    font-weight: bold;
+    color: #004d99;
+}
+
+.tab-content {
+    padding: 30px;
+}
+
+.hidden {
+    display: none;
+}
