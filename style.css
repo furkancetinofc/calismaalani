@@ -24,7 +24,7 @@ body {
 /* Başlıklar ve Açıklamalar */
 h1 {
     text-align: center;
-    color: #004d99; /* Kurumsal Mavi */
+    color: #004d99; /*  Mavi */
     margin-bottom: 10px;
     font-size: 1.8em;
 }
@@ -71,26 +71,6 @@ select {
 input:focus, select:focus {
     border-color: #004d99;
     outline: none;
-}
-
-/* Radyo Buton Grubu Stili */
-.radio-group {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.radio-group label {
-    font-weight: normal;
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 0;
-    cursor: pointer;
-}
-
-.radio-group input[type="radio"] {
-    width: auto;
-    margin-right: 5px;
 }
 
 
@@ -149,7 +129,7 @@ button:hover {
     text-align: center;
 }
 
-/* Tablo Stilleri (Harcırah Sonucu İçin) */
+/* Tablo Stilleri (Harcırah) */
 .sonuc-kutusu table {
     width: 100%;
     border-collapse: collapse;
