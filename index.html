@@ -12,7 +12,8 @@
         <div class="tab-buttons">
             <button id="tabCalismaBtn" class="active">Boş Gün Hesaplayıcı</button>
             <button id="tabHaricrahBtn">Harcırah Planlayıcı</button>
-            <button id="tabDegerBtn">Harcırah Değer Hesaplayıcı</button> </div>
+            <button id="tabDegerBtn">Harcırah Değer Hesaplayıcı</button>
+        </div>
 
         <div id="calismaGunTab" class="tab-content">
             <h1>Boş Gün Hesaplayıcı</h1>
@@ -69,7 +70,7 @@
         
         <div id="degerHesaplayiciTab" class="tab-content hidden">
             <h1>Harcırah Değer Hesaplayıcı</h1>
-            <p class="description">Gidilen ülkeye ve harcırah tipine göre harcırahınızın orijinal tutarını ve güncel TL karşılığını anlık kur üzerinden hesaplar.</p>
+            <p class="description">Gidilen ülkeye, harcırah sayısına ve anlık kura göre hak edişinizin güncel TL karşılığını hesaplar.</p>
 
             <div class="input-group">
                 <label for="ulkeSecimi">Gidilen Ülke:</label>
@@ -79,19 +80,14 @@
             </div>
             
             <div class="input-group">
-                <label>Harcırah Tipi:</label>
-                <div class="radio-group">
-                    <input type="radio" id="tamGun" name="harcirahTipi" value="tam" checked>
-                    <label for="tamGun">Tam Gün (24 Saat üzeri)</label>
-                    <input type="radio" id="kismiGun" name="harcirahTipi" value="kismi">
-                    <label for="kismiGun">Kısmi Gün (6-24 Saat arası)</label>
-                </div>
+                <label for="harcirahSayisi">Kaç Harcırah Hak Edildi (Sayı):</label>
+                <input type="number" id="harcirahSayisi" placeholder="Örn: 2" min="1" required>
             </div>
             
             <button id="hesaplaDegerBtn" class="mavi-btn">Güncel TL Karşılığını Hesapla</button>
 
             <div id="degerSonuc" class="sonuc-kutusu" style="text-align: left;">
-                Lütfen bir ülke seçiniz ve hesaplama yapınız.
+                Lütfen bir ülke seçiniz, harcırah sayısını giriniz ve hesaplama yapınız.
             </div>
         </div>
 
