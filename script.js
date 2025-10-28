@@ -1,5 +1,5 @@
 // *******************************************************************
-// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (SON VERSİYON) *********
+// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (V3 - API HATA DÜZELTMELİ) *********
 // *******************************************************************
 
 // ********* 1. API VE SABİT VERİ TANIMLARI *********
@@ -126,7 +126,7 @@ function ekleGirisAlani(canDelete = false) {
 }
 
 
-// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI (API GÜNCEL) *********
+// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI (API HATA DÜZELTMELİ) *********
 
 async function yukleYolUcretiVerilerini() {
     const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
@@ -141,26 +141,25 @@ async function yukleYolUcretiVerilerini() {
         const response = await fetch(AKARYAKIT_API_URL);
         const data = await response.json(); 
 
-        if (!data || data.status !== true || !data.data) {
-             throw new Error("API'den geçerli veri alınamadı veya status true değil.");
+        if (!data || data.status === false || !data.data) {
+             throw new Error("API'den geçerli veri alınamadı veya status false.");
         }
         
-        // ******* CHATGPT ÇÖZÜMÜ BURADA UYGULANDI *******
+        // Data nesnesinin ilk anahtarını alıyoruz (Örn: "52,31")
         const dataObj = data.data;
         const firstKey = Object.keys(dataObj)[0]; 
         
         if (!firstKey) {
-             throw new Error("API'den şehir bilgisi (anahtar) alınamadı.");
+             throw new Error("API'den benzin fiyat bilgisi içeren anahtar (şehir/bölge) alınamadı.");
         }
         
         const fiyatData = dataObj[firstKey]; 
         
-        // Güvenli erişim ve yedek fiyat kullanma
-        const fiyatString = fiyatData?.["Kursunsuz_95(Excellium95)_TL/lt"] || YEDEK_BENZIN_FIYATI.toString();
+        // API'deki kaçış karakterli (escaped) anahtarı kullanıyoruz: TL\/lt
+        const fiyatString = fiyatData?.["Kursunsuz_95(Excellium95)_TL\\/lt"] || YEDEK_BENZIN_FIYATI.toString();
 
         // Virgülü noktaya çevirip sayıya dönüştür
         const benzinFiyati = parseFloat(fiyatString.replace(',', '.')); 
-        // ******* CHATGPT ÇÖZÜMÜ SONU *******
 
 
         if (isNaN(benzinFiyati) || benzinFiyati <= 0) {
@@ -350,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Ocak: 31, Subat: 29, Mart: 31, Nisan: 30, Mayis: 31, Haziran: 30,
         Temmuz: 31, Agustos: 31, Eylul: 30, Ekim: 31, Kasim: 30, Aralik: 31
     };
-    const standartBosGun = 8; // Referans alınan boş gün sayısı
+    const standartBosGun = 8; 
 
     function hesaplaBoşGün() {
         const aySecimiSelect = document.getElementById('aySecimi');
