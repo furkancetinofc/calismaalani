@@ -73,26 +73,50 @@ input:focus, select:focus {
     outline: none;
 }
 
+/* YENİ: Başlık Etiketleri Stili (Hizalama Referansı) */
+.giris-basliklari {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px; 
+    padding-right: 50px; /* Sil butonu genişliği kadar sağdan boşluk bırak */
+}
+
+.giris-basliklari label {
+    font-weight: 600;
+    color: #333;
+    flex-grow: 1; 
+    margin-bottom: 0; 
+    font-size: 0.9em;
+}
+
 /* Dinamik Harcırah Giriş Alanları Stili */
 .dinamik-giris-satiri {
     display: flex;
-    gap: 10px;
+    gap: 10px; 
     align-items: center;
     margin-bottom: 15px;
 }
 
-.dinamik-giris-satiri .select-wrapper,
-.dinamik-giris-satiri .input-wrapper {
+/* Ülke Seçim Kutusuna ve Başlığa Genişlik Verilmesi */
+.dinamik-giris-satiri .select-wrapper {
     flex-grow: 1;
 }
 
-.dinamik-giris-satiri .input-wrapper {
-    flex-grow: 0.4;
-    min-width: 80px;
+.giris-basliklari label:not(.sayi-label) {
+    flex-grow: 1;
+}
+
+
+/* Sayı Kutusu ve Başlığı İçin Sabit Genişlik */
+.dinamik-giris-satiri .input-wrapper,
+.giris-basliklari .sayi-label {
+    flex-grow: 0;
+    width: 120px; /* Sabit bir genişlik */
+    min-width: 120px; 
 }
 
 .dinamik-giris-satiri label {
-    display: none; /* Etiketler, yan yana formda gizleniyor */
+    display: none; /* Dinamik satır içindeki etiketleri gizle */
 }
 
 /* Butonlar */
@@ -146,6 +170,7 @@ button:hover {
     font-size: 1.1em;
     font-weight: bold;
     border-radius: 6px;
+    flex-shrink: 0; /* Genişlemesini engelle */
 }
 
 .sil-btn:hover {
@@ -193,10 +218,12 @@ button:hover {
 .detay-hesaplama-kutusu {
     padding: 15px;
     margin-bottom: 20px;
-    border: 1px dashed #ccc;
+    /* Gönderdiğiniz tasarıma yakın çizgili çerçeve */
+    border: 2px dashed #004d99; 
     border-radius: 8px;
     background-color: #ffffff;
     text-align: left;
+    font-size: 0.95em;
 }
 
 .genel-toplam {
@@ -208,33 +235,19 @@ button:hover {
     border-radius: 8px;
     text-align: center;
 }
-
-.kur-listesi {
-    font-size: 0.9em;
-    color: #666;
-    margin-top: 15px;
-    text-align: center;
+.genel-toplam strong {
+    font-size: 1.5em;
+    color: #ff9900;
+}
+.detay-hesaplama-kutusu p {
+    margin: 5px 0;
 }
 
-/* Tablo Stilleri (Harcırah Planlayıcı İçin) */
-.sonuc-kutusu table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 1em;
-}
-
-.sonuc-kutusu th, 
-.sonuc-kutusu td {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-.sonuc-kutusu th {
-    background-color: #e6f0ff;
-    color: #004d99;
-    border-bottom: 2px solid #004d99;
+.detay-hesaplama-kutusu .toplam-tl {
+    font-size: 1.7em;
+    color: #cc0000;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 /* Sekme Stilleri */
