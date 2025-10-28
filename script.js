@@ -1,10 +1,11 @@
 // *******************************************************************
-// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (NİHAİ) *********
+// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (NİHAİ TEMİZ VERSİYON) *********
 // *******************************************************************
 
-// ********* API VE HARCIRAH VERİ TABANI *********
+// ********* 1. API VE SABİT VERİ TANIMLARI *********
+
+// Harcırah Verileri (III. GRUP DEĞERLERİ BAZ ALINMIŞTIR)
 const harcirahVerileri = {
-    // III. GRUP DEĞERLERİ BAZ ALINMIŞTIR (Örnek veriler)
     "ABD": { deger: 60, birim: "USD", dovizAdi: "$" },
     "AVUSTURYA": { deger: 55, birim: "EUR", dovizAdi: "€" },
     "ALMANYA": { deger: 54, birim: "EUR", dovizAdi: "€" },
@@ -36,14 +37,14 @@ const harcirahVerileri = {
 const API_KEY = 'SİZİN_ALDIĞINIZ_API_ANAHTARI'; 
 const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
-// Yol Ücreti API Tanımı
-const AKARYAKIT_API_URL = 'https://akaryakit-fiyatlari.vercel.app/api/tp/34'; 
+// Yol Ücreti API Tanımı ve Sabit Fiyatlar
+const AKARYAKIT_API_URL = 'https://hasanadiguzel.com.tr/api/akaryakit/sehir=ISTANBUL'; 
 const YEDEK_BENZIN_FIYATI = 52.15; // API çalışmazsa kullanılacak sabit fiyat
 
-// Yol Ücreti Fiyat Değişkenleri
+// Dinamik olarak yüklenecek benzin fiyatları
 let benzinFiyatlari = {
-    AVRUPA: 0, // Referans fiyatı tutacak
-    ANADOLU: 0  // Referans fiyatı tutacak
+    AVRUPA: 0,
+    ANADOLU: 0
 };
 let sonGuncellemeTarihi = "Bilinmiyor";
 
@@ -57,7 +58,7 @@ let kurVerileri = {
     "DEFAULT_NOK": 2.90, "DEFAULT_GBP": 37.00, "DEFAULT_SAR": 8.00
 };
 
-// ********* GENEL FONKSİYONLAR *********
+// ********* 2. GENEL VE YARDIMCI FONKSİYONLAR *********
 
 async function kurlariGetir() {
     try {
@@ -71,12 +72,11 @@ async function kurlariGetir() {
         const rates = data.conversion_rates;
         for (const birim in kurVerileri) {
             if (birim.length === 3 && rates[birim]) { 
-                kurVerileri[birim] = 1 / rates[birim]; // TRY'den diğer kura dönüşüm
+                kurVerileri[birim] = 1 / rates[birim]; 
             }
         }
     } catch (error) {
         console.error("Döviz Kuru API Hatası (Varsayılan kullanılıyor):", error);
-        // API başarısız olursa varsayılan kurları atıyoruz
         for (const birim in kurVerileri) {
             if (birim.length === 3 && kurVerileri[`DEFAULT_${birim}`]) {
                 kurVerileri[birim] = kurVerileri[`DEFAULT_${birim}`];
@@ -89,7 +89,6 @@ function ulkeSecimleriniDoldur(selectElement) {
     if (!selectElement) return;
     
     let html = '<option value="">-- Ülke Seçiniz --</option>';
-
     Object.keys(harcirahVerileri).sort().forEach(ulke => {
         html += `<option value="${ulke}">${ulke} (${harcirahVerileri[ulke].birim})</option>`;
     });
@@ -117,15 +116,8 @@ function ekleGirisAlani(canDelete = false) {
             <label for="sayi_${satirId}">Harcırah Sayısı:</label>
             <input type="number" class="harcirah-sayisi" id="sayi_${satirId}" min="1" required value="1">
         </div>
+        ${canDelete ? `<button type="button" class="sil-btn" onclick="this.parentNode.remove()">X</button>` : `<div style="width: 40px; flex-shrink: 0;"></div>`}
     `;
-
-    if (canDelete) {
-        // Silme butonu
-        html += `<button type="button" class="sil-btn" onclick="this.parentNode.remove()">X</button>`;
-    } else {
-        // İlk satır için yer tutucu
-        html += `<div style="width: 40px; flex-shrink: 0;"></div>`; 
-    }
 
     div.innerHTML = html;
     konteyner.appendChild(div);
@@ -134,97 +126,244 @@ function ekleGirisAlani(canDelete = false) {
     ulkeSecimleriniDoldur(selectElement);
 }
 
-// ********* DOM HAZIR *********
-document.addEventListener('DOMContentLoaded', () => {
-    kurlariGetir(); // Kurları hemen yüklemeye başla
-    ekleGirisAlani(false); // İlk harcırah giriş satırını ekle
 
-    // ********* SEKMELER ARASI GEÇİŞ MANTIĞI *********
+// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI *********
+
+async function yukleYolUcretiVerilerini() {
+    const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
+    const hesaplaYolUcretiBtn = document.getElementById('hesaplaYolUcretiBtn');
+
+    if (!yolUcretiSonucDiv || benzinFiyatlari.AVRUPA > 0) return; 
+
+    yolUcretiSonucDiv.innerHTML = "Güncel Akaryakıt fiyatı yükleniyor...";
+    yolUcretiSonucDiv.classList.remove('error');
+
+    try {
+        const response = await fetch(AKARYAKIT_API_URL);
+        const data = await response.json(); 
+
+        if (!data || data.status !== true || !data.data || data.data.length === 0) {
+             throw new Error("API'den geçerli veri alınamadı veya status true değil.");
+        }
+        
+        const fiyatData = data.data[0]; 
+        const fiyatString = fiyatData["Kursunsuz_95(Excellium95)_TL/lt"]; 
+        
+        if (!fiyatString) {
+             throw new Error("Hedef benzin fiyatı anahtarı (Kursunsuz_95...) bulunamadı.");
+        }
+        
+        // VİRGÜLLÜ METNİ SAYIYA ÇEVİRME İŞLEMİ (51,35 -> 51.35)
+        const benzinFiyati = parseFloat(fiyatString.replace(',', '.')); 
+
+        if (isNaN(benzinFiyati) || benzinFiyati <= 0) {
+             throw new Error(`Fiyat verisi geçersiz veya sıfır: ${fiyatString}`);
+        }
+
+        benzinFiyatlari.AVRUPA = benzinFiyati; 
+        benzinFiyatlari.ANADOLU = benzinFiyati; 
+        
+        const suankiTarih = new Date().toLocaleString('tr-TR', { 
+            year: 'numeric', month: 'short', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        });
+        
+        const fiyatStr = benzinFiyati.toFixed(2).replace('.', ',');
+        
+        yolUcretiSonucDiv.innerHTML = `
+            Güncel Referans Benzin Fiyatı (İstanbul - API):
+            <strong style="color: #004d99; font-size: 1.2em;">${fiyatStr} TL/Litre</strong>
+            <span style="font-size: 0.8em; color: #666;">Güncelleme: ${suankiTarih}</span><br><br>
+            Lütfen ikamet yakanızı ve kullanım sayısını giriniz.
+        `;
+        
+        hesaplaYolUcretiBtn.disabled = false;
+
+    } catch (error) {
+        console.error("Akaryakıt API Hatası:", error);
+        
+        // Yedek sabit fiyatı kullanma
+        benzinFiyatlari.AVRUPA = YEDEK_BENZIN_FIYATI; 
+        benzinFiyatlari.ANADOLU = YEDEK_BENZIN_FIYATI; 
+        hesaplaYolUcretiBtn.disabled = false; 
+        
+        const yedekFiyatStr = YEDEK_BENZIN_FIYATI.toFixed(2).replace('.', ',');
+        yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+        yolUcretiSonucDiv.innerHTML = `Hata: Fiyat yüklenemedi. (${error.message})`;
+        yolUcretiSonucDiv.innerHTML += `<br> <span style='color:green;'>**Geçici olarak ${yedekFiyatStr} TL/Litre sabit fiyatı kullanılıyor.**</span>`;
+    }
+}
+
+function hesaplaYolUcreti() {
+    const ikametYeriSelect = document.getElementById('ikametYeri');
+    const yolKullanimInput = document.getElementById('yolKullanimSayisi');
+    const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
+
+    if (benzinFiyatlari.AVRUPA === 0) {
+        yolUcretiSonucDiv.innerHTML = "Fiyat verisi yüklenemediği için hesaplama yapılamıyor.";
+        yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+        return;
+    }
+
+    const ikamet = ikametYeriSelect.value;
+    const yolSayisi = parseInt(yolKullanimInput.value); 
+
+    if (!ikamet || isNaN(yolSayisi) || yolSayisi < 0) {
+        yolUcretiSonucDiv.innerHTML = "Lütfen ikamet yakanızı seçiniz ve geçerli bir kullanım sayısı giriniz.";
+        yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+        return;
+    }
+
+    let katsayi;
+    let yakaAciklama;
+    const kullanilacakFiyat = benzinFiyatlari.AVRUPA; // Her iki yaka için referans fiyat
+    
+    if (ikamet === 'AVRUPA') {
+        katsayi = 3.25;
+        yakaAciklama = "İstanbul (Avrupa Yakası) İkamet Katsayısı";
+    } else if (ikamet === 'ANADOLU') {
+        katsayi = 6.5;
+        yakaAciklama = "İstanbul (Anadolu Yakası) İkamet Katsayısı";
+    }
+
+    const tekYonUcret = kullanilacakFiyasst * katsayi;
+    const toplamHakEdis = tekYonUcret * yolSayisi; 
+    
+    const tekYonStr = tekYonUcret.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const toplamHakEdisStr = toplamHakEdis.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fiyatStr = kullanilacakFiyat.toFixed(2).replace('.', ','); 
+    
+    yolUcretiSonucDiv.innerHTML = `
+        <div style="text-align: center;">
+            <h3 style="color: #004d99; margin-top: 0; font-size: 1.4em;">Yol Ücreti Hesaplama Sonucu</h3>
+            <p>
+                <strong style="color:#666; font-size: 0.9em;">${yakaAciklama} (${katsayi} Katsayısı)</strong>
+            </p>
+            <p style="font-size: 1.1em;">
+                Kullanılan Benzin Fiyatı: <strong>${fiyatStr} TL/Litre</strong>
+            </p>
+            
+            <hr style="border-top: 1px solid #ccc; width: 60%; margin: 15px auto;">
+
+            <p style="font-size: 1.3em; color: #cc0000; margin-bottom: 5px;">
+                Tek Yön Yol Ücreti Hak Edişi: 
+                <strong>${tekYonStr} TL</strong>
+            </p>
+            
+            <p style="font-size: 1.7em; color: #008000; margin-top: 15px;">
+                Toplam Hak Edilen Yol Ücreti (${yolSayisi} Yol): 
+                <strong>${toplamHakEdisStr} TL</strong>
+            </p>
+            
+            <p style="font-size: 0.8em; color: #999; margin-top: 20px;">
+                *Hesaplama: ${fiyatStr} TL × ${katsayi} Katsayısı × ${yolSayisi} Yol
+            </p>
+        </div>
+    `;
+    yolUcretiSonucDiv.classList.remove('error');
+}
+
+
+// ********* 4. DOM YÜKLEME VE OLAY YÖNETİCİLERİ *********
+
+document.addEventListener('DOMContentLoaded', () => {
+    kurlariGetir(); 
+    ekleGirisAlani(false); 
+
+    // Genel DOM elementleri
     const tabCalismaBtn = document.getElementById('tabCalismaBtn');
     const tabHaricrahBtn = document.getElementById('tabHaricrahBtn');
     const tabDegerBtn = document.getElementById('tabDegerBtn'); 
     const tabYolUcretiBtn = document.getElementById('tabYolUcretiBtn');
+    const allTabs = [document.getElementById('calismaGunTab'), document.getElementById('haricrahTab'), document.getElementById('degerHesaplayiciTab'), document.getElementById('yolUcretiTab')];
+    const allBtns = [tabCalismaBtn, tabHaricrahBtn, tabDegerBtn, tabYolUcretiBtn];
+    
+    const hesaplaYolUcretiBtn = document.getElementById('hesaplaYolUcretiBtn');
 
-    const calismaGunTab = document.getElementById('calismaGunTab');
-    const haricrahTab = document.getElementById('haricrahTab');
-    const degerHesaplayiciTab = document.getElementById('degerHesaplayiciTab');
-    const yolUcretiTab = document.getElementById('yolUcretiTab');
+    // Sekme değiştirme mantığı
+    const changeTab = (activeTab, activeBtn) => {
+        allTabs.forEach(tab => tab.classList.add('hidden'));
+        allBtns.forEach(btn => btn.classList.remove('active'));
+        activeTab.classList.remove('hidden');
+        activeBtn.classList.add('active');
 
-    if (tabCalismaBtn && tabHaricrahBtn && calismaGunTab && haricrahTab && tabDegerBtn && degerHesaplayiciTab && tabYolUcretiBtn && yolUcretiTab) {
-        const allTabs = [calismaGunTab, haricrahTab, degerHesaplayiciTab, yolUcretiTab];
-        const allBtns = [tabCalismaBtn, tabHaricrahBtn, tabDegerBtn, tabYolUcretiBtn];
+        if (activeBtn === tabYolUcretiBtn) {
+            yukleYolUcretiVerilerini();
+        }
+    };
+
+    if (tabCalismaBtn && tabHaricrahBtn && tabDegerBtn && tabYolUcretiBtn) {
+        tabCalismaBtn.addEventListener('click', () => changeTab(document.getElementById('calismaGunTab'), tabCalismaBtn));
+        tabHaricrahBtn.addEventListener('click', () => changeTab(document.getElementById('haricrahTab'), tabHaricrahBtn));
+        tabDegerBtn.addEventListener('click', () => changeTab(document.getElementById('degerHesaplayiciTab'), tabDegerBtn));
+        tabYolUcretiBtn.addEventListener('click', () => changeTab(document.getElementById('yolUcretiTab'), tabYolUcretiBtn));
         
-        const changeTab = (activeTab, activeBtn) => {
-            allTabs.forEach(tab => tab.classList.add('hidden'));
-            allBtns.forEach(btn => btn.classList.remove('active'));
-            
-            activeTab.classList.remove('hidden');
-            activeBtn.classList.add('active');
-
-            // Yol Ücreti sekmesine geçince fiyatı yüklemeyi başlat
-            if (activeBtn === tabYolUcretiBtn) {
-                yukleYolUcretiVerilerini();
-            }
-        };
-
-        tabCalismaBtn.addEventListener('click', () => changeTab(calismaGunTab, tabCalismaBtn));
-        tabHaricrahBtn.addEventListener('click', () => changeTab(haricrahTab, tabHaricrahBtn));
-        tabDegerBtn.addEventListener('click', () => changeTab(degerHesaplayiciTab, tabDegerBtn));
-        tabYolUcretiBtn.addEventListener('click', () => changeTab(yolUcretiTab, tabYolUcretiBtn));
-        
-        // Varsayılan olarak aktif olan sekmenin API yüklemesini yap (Eğer yol ücreti değilse yapmaz)
         if (tabYolUcretiBtn.classList.contains('active')) {
              yukleYolUcretiVerilerini();
         }
     }
 
-
-    // ********* 1. BOŞ GÜN HESAPLAYICISI MANTIĞI *********
-    const bosGunTablosu = { 
-        31: 8, 30: 8, 29: 8, 28: 7, 27: 7, 26: 7, 25: 7, 
-        24: 6, 23: 6, 22: 6, 21: 6, 20: 5, 19: 5, 
-        18: 5, 17: 5, 16: 4, 15: 4, 14: 4, 13: 3, 
-        12: 3, 11: 3, 10: 3, 9: 2, 8: 2, 7: 2, 
-        6: 2, 5: 1, 4: 1, 3: 1, 2: 1, 1: 0, 0: 0 
-    };
-
-    const ayGunleri = {
-        Ocak: 31, Subat: 29, Mart: 31, Nisan: 30, Mayis: 31, Haziran: 30,
-        Temmuz: 31, Agustos: 31, Eylul: 30, Ekim: 31, Kasim: 30, Aralik: 31
-    };
-    
-    const aySecimiSelect = document.getElementById('aySecimi');
-    const izinGunInput = document.getElementById('izinGunSayisi');
+    // 1. Boş Gün Hesaplayıcısı Olay Yöneticileri
     const hesaplaBtn = document.getElementById('hesaplaBtn');
-    const sonucDiv = document.getElementById('sonuc');
-    
     if (hesaplaBtn) {
         hesaplaBtn.addEventListener('click', hesaplaBoşGün);
     }
 
-    function hesaplaBoşGün() {
-        if (!aySecimiSelect || !izinGunInput || !sonucDiv) return;
+    // 2. Harcırah Planlayıcısı Olay Yöneticileri
+    const planlaHaricrahBtn = document.getElementById('planlaHaricrahBtn');
+    if (planlaHaricrahBtn) {
+        planlaHaricrahBtn.addEventListener('click', planlaHaricrah);
+    }
+    
+    // 3. Harcırah Değer Hesaplayıcısı Olay Yöneticileri
+    const ekleBtn = document.getElementById('ekleBtn');
+    const hesaplaDegerBtn = document.getElementById('hesaplaDegerBtn');
+    if (ekleBtn) {
+        ekleBtn.addEventListener('click', () => ekleGirisAlani(true));
+    }
+    if (hesaplaDegerBtn) {
+        hesaplaDegerBtn.addEventListener('click', hesaplaHaricrahDeger);
+    }
 
+    // 4. Yol Ücreti Hesaplayıcısı Olay Yöneticileri
+    if (hesaplaYolUcretiBtn) {
+        hesaplaYolUcretiBtn.addEventListener('click', hesaplaYolUcreti);
+        hesaplaYolUcretiBtn.disabled = true;
+    }
+
+
+    // ********* 5. BOŞ GÜN HESAPLAMA MANTIĞI (İç İçe Fonksiyonlar) *********
+    
+    const bosGunTablosu = { 
+        31: 8, 30: 8, 29: 8, 28: 7, 27: 7, 26: 7, 25: 7, 24: 6, 23: 6, 22: 6, 21: 6, 20: 5, 19: 5, 
+        18: 5, 17: 5, 16: 4, 15: 4, 14: 4, 13: 3, 12: 3, 11: 3, 10: 3, 9: 2, 8: 2, 7: 2, 
+        6: 2, 5: 1, 4: 1, 3: 1, 2: 1, 1: 0, 0: 0 
+    };
+    const ayGunleri = {
+        Ocak: 31, Subat: 29, Mart: 31, Nisan: 30, Mayis: 31, Haziran: 30,
+        Temmuz: 31, Agustos: 31, Eylul: 30, Ekim: 31, Kasim: 30, Aralik: 31
+    };
+    const standartBosGun = 8; // Referans alınan boş gün sayısı
+
+    function hesaplaBoşGün() {
+        const aySecimiSelect = document.getElementById('aySecimi');
+        const izinGunInput = document.getElementById('izinGunSayisi');
+        const sonucDiv = document.getElementById('sonuc');
+        
         const ayAdi = aySecimiSelect.value;
         const izinGunSayisi = parseInt(izinGunInput.value);
 
-        // ... (Hesaplama mantığı aynı kalıyor) ...
-        const standartBosGun = 8; // Referans alınan boş gün sayısı
-        const ayGunSayisi = ayGunleri[ayAdi];
-        
         if (!ayAdi || isNaN(izinGunSayisi) || izinGunSayisi < 0) {
             sonucDiv.innerHTML = "Lütfen geçerli bir ay seçin ve izin gün sayısını girin.";
             sonucDiv.className = 'sonuc-kutusu error';
             return;
         }
 
+        const ayGunSayisi = ayGunleri[ayAdi];
         let fiiliCalismaGunu = ayGunSayisi - izinGunSayisi;
         
-        if (fiiliCalismaGunu > 31) {
-            fiiliCalismaGunu = 31;
-        } else if (fiiliCalismaGunu < 1) {
-            fiiliCalismaGunu = 0;
-        }
+        if (fiiliCalismaGunu > 31) fiiliCalismaGunu = 31;
+        else if (fiiliCalismaGunu < 1) fiiliCalismaGunu = 0;
 
         const hakEdilenBosGun = bosGunTablosu[fiiliCalismaGunu];
         
@@ -254,18 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ********* 2. HARCIRAH PLANLAYICISI MANTIĞI *********
-    const motorKapamaZamaniInput = document.getElementById('motorKapamaZamani');
-    const planlaHaricrahBtn = document.getElementById('planlaHaricrahBtn');
-    const haricrahSonucDiv = document.getElementById('haricrahSonuc');
-
-    if (planlaHaricrahBtn) {
-        planlaHaricrahBtn.addEventListener('click', planlaHaricrah);
-    }
+    // ********* 6. HARCIRAH PLANLAMA MANTIĞI (İç İçe Fonksiyon) *********
 
     function planlaHaricrah() {
-        // ... (Harcırah Planlama Mantığı aynı kalıyor) ...
-        if (!motorKapamaZamaniInput || !haricrahSonucDiv) return;
+        const motorKapamaZamaniInput = document.getElementById('motorKapamaZamani');
+        const haricrahSonucDiv = document.getElementById('haricrahSonuc');
 
         const motorKapamaZamaniStr = motorKapamaZamaniInput.value;
 
@@ -276,14 +408,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const motorKapamaDate = new Date(motorKapamaZamaniStr);
-        
         const year = motorKapamaDate.getFullYear();
         const month = motorKapamaDate.getMonth();
         const day = motorKapamaDate.getDate();
         const hours = motorKapamaDate.getHours();
         const minutes = motorKapamaDate.getMinutes();
         
-        let baslangicSuresiMs = Date.UTC(year, month, day, hours, minutes) + (30 * 60 * 1000); 
+        let baslangicSuresiMs = Date.UTC(year, month, day, hours, minutes) + (30 * 60 * 1000); // Motor Kapama + 30 Dk
 
         let tabloHTML = `
             <h2>Minimum Harcırah Hak Ediş Saatleri</h2>
@@ -301,22 +432,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (N === 1) {
                 const yirmiDortSaatMs = 24 * 60 * 60 * 1000;
                 const bitisSuresiMs = baslangicSuresiMs + yirmiDortSaatMs;
-                
                 pushbackMs = bitisSuresiMs + (1 * 60 * 60 * 1000);
                 zamanAciklamasi = "ve öncesi";
 
             } else {
                 const gunMs = (N - 1) * 24 * 60 * 60 * 1000;
                 const birDakikaMs = 1 * 60 * 1000;
-
                 const minBitisSuresiMs = baslangicSuresiMs + gunMs + birDakikaMs;
-                
                 pushbackMs = minBitisSuresiMs + (1 * 60 * 60 * 1000);
                 zamanAciklamasi = "ve sonrası";
             }
 
             const pushbackDate = new Date(pushbackMs);
-
             const tarihSecenekleri = { 
                 year: 'numeric', month: 'short', day: 'numeric', 
                 hour: '2-digit', minute: '2-digit', 
@@ -338,23 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
         haricrahSonucDiv.innerHTML = tabloHTML;
         haricrahSonucDiv.classList.remove('error');
     }
-
-    // ********* 3. HARCIRAH DEĞER HESAPLAYICISI MANTIĞI *********
-    const ekleBtn = document.getElementById('ekleBtn');
-    const hesaplaDegerBtn = document.getElementById('hesaplaDegerBtn');
-    const degerSonucDiv = document.getElementById('degerSonuc');
-
-    if (ekleBtn) {
-        ekleBtn.addEventListener('click', () => ekleGirisAlani(true));
-    }
-
-    if (hesaplaDegerBtn) {
-        hesaplaDegerBtn.addEventListener('click', hesaplaHaricrahDeger);
-    }
+    
+    // ********* 7. HARCIRAH DEĞER HESAPLAMA MANTIĞI (İç İçe Fonksiyon) *********
 
     function hesaplaHaricrahDeger() {
-        // ... (Harcırah Değer Hesaplama Mantığı aynı kalıyor) ...
-        if (!degerSonucDiv) return;
+        const degerSonucDiv = document.getElementById('degerSonuc');
 
         const girisSatirlari = document.querySelectorAll('.dinamik-giris-satiri');
         let toplamTL = 0;
@@ -437,153 +552,5 @@ document.addEventListener('DOMContentLoaded', () => {
         
         degerSonucDiv.innerHTML = nihaiHTML;
         degerSonucDiv.classList.remove('error');
-    }
-    
-    // ********* 4. YOL ÜCRETİ HESAPLAYICISI MANTIĞI *********
-    
-    const ikametYeriSelect = document.getElementById('ikametYeri');
-    const yolKullanimInput = document.getElementById('yolKullanimSayisi');
-    const hesaplaYolUcretiBtn = document.getElementById('hesaplaYolUcretiBtn');
-    const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
-
-
-    async function yukleYolUcretiVerilerini() {
-        if (!yolUcretiSonucDiv || benzinFiyatlari.AVRUPA > 0) return; 
-
-        yolUcretiSonucDiv.innerHTML = "Güncel Akaryakıt fiyatı yükleniyor...";
-        yolUcretiSonucDiv.classList.remove('error');
-
-        try {
-            const response = await fetch(AKARYAKIT_API_URL);
-            const data = await response.json(); 
-
-            if (!data || data.length === 0) {
-                 throw new Error("API'den geçerli bir fiyat dizisi alınamadı.");
-            }
-            
-            // ISTANBUL - AVRUPA fiyatını bulmaya çalışıyoruz.
-            let fiyatObjesi = data.find(item => item.ilce === "ISTANBUL - AVRUPA");
-
-            // Eğer ISTANBUL - AVRUPA bulunamazsa, ISTANBUL - ANADOLU fiyatını yedek olarak kullanıyoruz.
-            if (!fiyatObjesi) {
-                 fiyatObjesi = data.find(item => item.ilce === "ISTANBUL - ANADOLU");
-            }
-            
-            if (!fiyatObjesi || typeof fiyatObjesi.benzin !== 'number') {
-                 throw new Error("Benzin fiyatı ('benzin' anahtarı) tespit edilemedi veya sayı değil.");
-            }
-
-            const benzinFiyati = fiyatObjesi.benzin; 
-            const referansIlce = fiyatObjesi.ilce;
-
-            // Bulunan fiyatı her iki yaka için referans olarak atıyoruz.
-            benzinFiyatlari.AVRUPA = benzinFiyati; 
-            benzinFiyatlari.ANADOLU = benzinFiyati; 
-            
-            // Fiyat verisinin alındığı tarih
-            const suankiTarih = new Date().toLocaleString('tr-TR', { 
-                year: 'numeric', month: 'short', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit' 
-            });
-
-
-            if (benzinFiyati <= 0) {
-                 throw new Error("API'den geçerli bir sayısal fiyat değeri alınamadı.");
-            }
-            
-            yolUcretiSonucDiv.innerHTML = `
-                Güncel Referans Benzin Fiyatı (${referansIlce}):
-                <strong style="color: #004d99; font-size: 1.2em;">${benzinFiyati.toFixed(2).replace('.', ',')} TL/Litre</strong>
-                <span style="font-size: 0.8em; color: #666;">Güncelleme: ${suankiTarih}</span><br><br>
-                Lütfen ikamet yakanızı ve kullanım sayısını giriniz.
-            `;
-            
-            hesaplaYolUcretiBtn.disabled = false;
-
-        } catch (error) {
-            console.error("Akaryakıt API Hatası:", error);
-            yolUcretiSonucDiv.innerHTML = `Hata: Referans benzin fiyatı yüklenemedi. Hesaplama yapılamıyor. (${error.message})`;
-            
-            // API çekilemezse, yedek sabit fiyatı atıyoruz.
-            benzinFiyatlari.AVRUPA = YEDEK_BENZIN_FIYATI; 
-            benzinFiyatlari.ANADOLU = YEDEK_BENZIN_FIYATI; 
-            hesaplaYolUcretiBtn.disabled = false; 
-            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
-            yolUcretiSonucDiv.innerHTML += `<br> <span style='color:green;'>**Geçici olarak ${YEDEK_BENZIN_FIYATI.toFixed(2).replace('.', ',')} TL/Litre sabit fiyatı kullanılıyor.**</span>`;
-        }
-    }
-
-    if (hesaplaYolUcretiBtn) {
-        hesaplaYolUcretiBtn.addEventListener('click', hesaplaYolUcreti);
-        hesaplaYolUcretiBtn.disabled = true;
-    }
-
-    function hesaplaYolUcreti() {
-        if (benzinFiyatlari.AVRUPA === 0) {
-            yolUcretiSonucDiv.innerHTML = "Fiyat verisi yüklenemediği için hesaplama yapılamıyor.";
-            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
-            return;
-        }
-
-        const ikamet = ikametYeriSelect.value;
-        const yolSayisi = parseInt(yolKullanimInput.value); 
-
-        if (!ikamet || isNaN(yolSayisi) || yolSayisi < 0) {
-            yolUcretiSonucDiv.innerHTML = "Lütfen ikamet yakanızı seçiniz ve geçerli bir kullanım sayısı giriniz.";
-            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
-            return;
-        }
-
-        let katsayi;
-        let yakaAciklama;
-        // Referans fiyat olarak AVRUPA'ya atanan fiyatı kullanıyoruz.
-        let kullanilacakFiyat = benzinFiyatlari.AVRUPA; 
-        
-        if (ikamet === 'AVRUPA') {
-            katsayi = 3.25;
-            yakaAciklama = "İstanbul (Avrupa Yakası) İkamet Katsayısı";
-        } else if (ikamet === 'ANADOLU') {
-            katsayi = 6.5;
-            yakaAciklama = "İstanbul (Anadolu Yakası) İkamet Katsayısı";
-        }
-
-        // Tek yön hak edişi
-        const tekYonUcret = kullanilacakFiyat * katsayi;
-        
-        // Toplam hak ediş (Tek Yön Ücret * Kullanım Sayısı)
-        const toplamHakEdis = tekYonUcret * yolSayisi; 
-        
-        const tekYonStr = tekYonUcret.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const toplamHakEdisStr = toplamHakEdis.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const fiyatStr = kullanilacakFiyat.toFixed(2).replace('.', ','); 
-        
-        yolUcretiSonucDiv.innerHTML = `
-            <div style="text-align: center;">
-                <h3 style="color: #004d99; margin-top: 0; font-size: 1.4em;">Yol Ücreti Hesaplama Sonucu</h3>
-                <p>
-                    <strong style="color:#666; font-size: 0.9em;">${yakaAciklama} (${katsayi} Katsayısı)</strong>
-                </p>
-                <p style="font-size: 1.1em;">
-                    Kullanılan Benzin Fiyatı: <strong>${fiyatStr} TL/Litre</strong>
-                </p>
-                
-                <hr style="border-top: 1px solid #ccc; width: 60%; margin: 15px auto;">
-
-                <p style="font-size: 1.3em; color: #cc0000; margin-bottom: 5px;">
-                    Tek Yön Yol Ücreti Hak Edişi: 
-                    <strong>${tekYonStr} TL</strong>
-                </p>
-                
-                <p style="font-size: 1.7em; color: #008000; margin-top: 15px;">
-                    Toplam Hak Edilen Yol Ücreti (${yolSayisi} Yol): 
-                    <strong>${toplamHakEdisStr} TL</strong>
-                </p>
-                
-                <p style="font-size: 0.8em; color: #999; margin-top: 20px;">
-                    *Hesaplama: ${fiyatStr} TL × ${katsayi} Katsayısı × ${yolSayisi} Yol
-                </p>
-            </div>
-        `;
-        yolUcretiSonucDiv.classList.remove('error');
     }
 });
