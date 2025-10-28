@@ -16,7 +16,7 @@
         </div>
 
         <div id="calismaGunTab" class="tab-content">
-            <h1>Boş Gün Hesaplayıcı</h1>
+            <h1>Uçucu Ekip Boş Gün Hesaplayıcı</h1>
             <p class="description">Ay seçiminize ve rapor/mazeret izinlerinize göre hak ettiğiniz "Kullanılabilecek Boş Gün" sayısını hesaplar.</p>
 
             <div class="input-group">
@@ -69,25 +69,18 @@
         </div>
         
         <div id="degerHesaplayiciTab" class="tab-content hidden">
-            <h1>Harcırah Değer Hesaplayıcı</h1>
-            <p class="description">Gidilen ülkeye, harcırah sayısına ve anlık kura göre hak edişinizin güncel TL karşılığını hesaplar.</p>
+            <h1>Harcırah Değer Hesaplayıcı (Çoklu Uçuş)</h1>
+            <p class="description">Gidilen ülkeye ve harcırah sayısına göre hak edişinizin güncel TL karşılığını hesaplar. Birden fazla uçuş ekleyebilirsiniz.</p>
 
-            <div class="input-group">
-                <label for="ulkeSecimi">Gidilen Ülke:</label>
-                <select id="ulkeSecimi" required>
-                    <option value="">-- Ülke Seçiniz --</option>
-                    </select>
-            </div>
+            <div id="harcirahGirisleri">
+                </div>
             
-            <div class="input-group">
-                <label for="harcirahSayisi">Kaç Harcırah Hak Edildi (Sayı):</label>
-                <input type="number" id="harcirahSayisi" placeholder="Örn: 2" min="1" required>
-            </div>
+            <button id="ekleBtn" class="mavi-btn-kucuk" style="margin-top: 5px;">+ Yeni Uçuş Ekle</button>
             
-            <button id="hesaplaDegerBtn" class="mavi-btn">Güncel TL Karşılığını Hesapla</button>
+            <button id="hesaplaDegerBtn" class="mavi-btn">Toplam TL Karşılığını Hesapla</button>
 
-            <div id="degerSonuc" class="sonuc-kutusu" style="text-align: left;">
-                Lütfen bir ülke seçiniz, harcırah sayısını giriniz ve hesaplama yapınız.
+            <div id="degerSonuc" class="sonuc-kutusu detay-sonuc" style="text-align: left;">
+                Lütfen ülke seçiniz, harcırah sayısını giriniz ve hesaplama yapınız.
             </div>
         </div>
 
