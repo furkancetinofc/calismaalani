@@ -92,7 +92,7 @@
         
         <div id="yolUcretiTab" class="tab-content hidden">
             <h1>Personel Yol Ücreti Hesaplayıcı</h1>
-            <p class="description">İkamet yakanıza ve güncel benzin fiyatına göre hak ettiğiniz tek yön yol ücretini hesaplar.</p>
+            <p class="description">İkamet yakanıza ve güncel Kadıköy benzin fiyatına göre hak ettiğiniz toplam yol ücretini hesaplar.</p>
 
             <div class="input-group">
                 <label for="ikametYeri">İkamet Yakanız:</label>
@@ -103,14 +103,19 @@
                 </select>
             </div>
             
+            <div class="input-group">
+                <label for="yolKullanimSayisi">Toplam Yol Kullanım Sayısı (Tek Yön):</label>
+                <input type="number" id="yolKullanimSayisi" placeholder="Örn: 4 (2 gidiş, 2 geliş)" min="0" required>
+            </div>
+
             <button id="hesaplaYolUcretiBtn">Yol Ücretini Hesapla</button>
 
             <div id="yolUcretiSonuc" class="sonuc-kutusu" style="text-align: left; min-height: 100px;">
-                Lütfen ikamet yakanızı seçiniz.
+                Lütfen ikamet yakanızı ve kullanım sayısını giriniz.
             </div>
             
             <p class="not">
-                *Hesaplama, Kurşunsuz 95 Oktan Benzin Fiyatı baz alınarak yapılmıştır. Fiyat verisi üçüncü taraf bir API'den (İstanbul, Petrol Ofisi) çekilmektedir.
+                *Hesaplama, Kurşunsuz Benzin 95 Oktan Kadıköy fiyatı baz alınarak yapılmıştır. Fiyat verisi Opet API'den çekilmektedir.
             </p>
         </div>
 
