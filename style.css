@@ -78,7 +78,6 @@ input:focus, select:focus {
     display: flex;
     gap: 10px;
     margin-bottom: 8px; 
-    padding-right: 50px; /* Sil butonu genişliği kadar sağdan boşluk bırak */
 }
 
 .giris-basliklari label {
@@ -117,6 +116,13 @@ input:focus, select:focus {
 
 .dinamik-giris-satiri label {
     display: none; /* Dinamik satır içindeki etiketleri gizle */
+}
+
+/* YENİ HİZALAMA DÜZELTMESİ */
+/* Başlık alanının, giriş satırlarıyla aynı genişliğe sahip olması için 
+   silme butonu genişliği kadar sağdan boşluk bırakıyoruz */
+.giris-basliklari {
+    padding-right: 50px; /* Sil butonu (40px) + 10px boşluk = 50px */
 }
 
 /* Butonlar */
@@ -218,7 +224,6 @@ button:hover {
 .detay-hesaplama-kutusu {
     padding: 15px;
     margin-bottom: 20px;
-    /* Gönderdiğiniz tasarıma yakın çizgili çerçeve */
     border: 2px dashed #004d99; 
     border-radius: 8px;
     background-color: #ffffff;
