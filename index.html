@@ -10,12 +10,13 @@
     <div class="container">
         
         <div class="tab-buttons">
-            <button id="tabCalismaBtn" class="active">Boş Gün Hesaplayıcı</button>
+            <button id="tabCalismaBtn">Boş Gün Hesaplayıcı</button>
             <button id="tabHaricrahBtn">Harcırah Planlayıcı</button>
-            <button id="tabDegerBtn">Harcırah Değer Hesaplayıcı</button>
+            <button id="tabDegerBtn" class="active">Harcırah Değer Hesaplayıcı</button>
+            <button id="tabYolUcretiBtn">Yol Ücreti Hesaplayıcı</button>
         </div>
 
-        <div id="calismaGunTab" class="tab-content">
+        <div id="calismaGunTab" class="tab-content hidden">
             <h1>Uçucu Ekip Boş Gün Hesaplayıcı</h1>
             <p class="description">Ay seçiminize ve rapor/mazeret izinlerinize göre hak ettiğiniz "Kullanılabilecek Boş Gün" sayısını hesaplar.</p>
 
@@ -68,7 +69,7 @@
             </div>
         </div>
         
-        <div id="degerHesaplayiciTab" class="tab-content hidden">
+        <div id="degerHesaplayiciTab" class="tab-content">
             <h1>Harcırah Değer Hesaplayıcı (Çoklu Uçuş)</h1>
             <p class="description">Gidilen ülkeye ve harcırah sayısına göre hak edişinizin güncel TL karşılığını hesaplar. Birden fazla uçuş ekleyebilirsiniz.</p>
 
@@ -87,6 +88,30 @@
             <div id="degerSonuc" class="sonuc-kutusu detay-sonuc" style="text-align: left;">
                 Lütfen ülke seçiniz, harcırah sayısını giriniz ve hesaplama yapınız.
             </div>
+        </div>
+        
+        <div id="yolUcretiTab" class="tab-content hidden">
+            <h1>Personel Yol Ücreti Hesaplayıcı</h1>
+            <p class="description">İkamet yakanıza ve güncel benzin fiyatına göre hak ettiğiniz tek yön yol ücretini hesaplar.</p>
+
+            <div class="input-group">
+                <label for="ikametYeri">İkamet Yakanız:</label>
+                <select id="ikametYeri" required>
+                    <option value="">-- Lütfen Seçiniz --</option>
+                    <option value="AVRUPA">İstanbul (Avrupa Yakası)</option>
+                    <option value="ANADOLU">İstanbul (Anadolu Yakası)</option>
+                </select>
+            </div>
+            
+            <button id="hesaplaYolUcretiBtn">Yol Ücretini Hesapla</button>
+
+            <div id="yolUcretiSonuc" class="sonuc-kutusu" style="text-align: left; min-height: 100px;">
+                Lütfen ikamet yakanızı seçiniz.
+            </div>
+            
+            <p class="not">
+                *Hesaplama, Kurşunsuz 95 Oktan Benzin Fiyatı baz alınarak yapılmıştır. Fiyat verisi üçüncü taraf bir API'den (İstanbul, Petrol Ofisi) çekilmektedir.
+            </p>
         </div>
 
 
