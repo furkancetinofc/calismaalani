@@ -1,5 +1,5 @@
 // *******************************************************************
-// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (NİHAİ TEMİZ VERSİYON) *********
+// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (SON VERSİYON) *********
 // *******************************************************************
 
 // ********* 1. API VE SABİT VERİ TANIMLARI *********
@@ -39,14 +39,13 @@ const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
 // Yol Ücreti API Tanımı ve Sabit Fiyatlar
 const AKARYAKIT_API_URL = 'https://hasanadiguzel.com.tr/api/akaryakit/sehir=ISTANBUL'; 
-const YEDEK_BENZIN_FIYATI = 52.15; // API çalışmazsa kullanılacak sabit fiyat
+const YEDEK_BENZIN_FIYATI = 52.00; // Yeni yedek fiyat 52 TL
 
 // Dinamik olarak yüklenecek benzin fiyatları
 let benzinFiyatlari = {
     AVRUPA: 0,
     ANADOLU: 0
 };
-let sonGuncellemeTarihi = "Bilinmiyor";
 
 // Varsayılan Kurlar (API başarısız olursa kullanılacak)
 let kurVerileri = {
@@ -127,7 +126,7 @@ function ekleGirisAlani(canDelete = false) {
 }
 
 
-// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI *********
+// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI (API GÜNCEL) *********
 
 async function yukleYolUcretiVerilerini() {
     const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
@@ -142,19 +141,27 @@ async function yukleYolUcretiVerilerini() {
         const response = await fetch(AKARYAKIT_API_URL);
         const data = await response.json(); 
 
-        if (!data || data.status !== true || !data.data || data.data.length === 0) {
+        if (!data || data.status !== true || !data.data) {
              throw new Error("API'den geçerli veri alınamadı veya status true değil.");
         }
         
-        const fiyatData = data.data[0]; 
-        const fiyatString = fiyatData["Kursunsuz_95(Excellium95)_TL/lt"]; 
+        // ******* CHATGPT ÇÖZÜMÜ BURADA UYGULANDI *******
+        const dataObj = data.data;
+        const firstKey = Object.keys(dataObj)[0]; 
         
-        if (!fiyatString) {
-             throw new Error("Hedef benzin fiyatı anahtarı (Kursunsuz_95...) bulunamadı.");
+        if (!firstKey) {
+             throw new Error("API'den şehir bilgisi (anahtar) alınamadı.");
         }
         
-        // VİRGÜLLÜ METNİ SAYIYA ÇEVİRME İŞLEMİ (51,35 -> 51.35)
+        const fiyatData = dataObj[firstKey]; 
+        
+        // Güvenli erişim ve yedek fiyat kullanma
+        const fiyatString = fiyatData?.["Kursunsuz_95(Excellium95)_TL/lt"] || YEDEK_BENZIN_FIYATI.toString();
+
+        // Virgülü noktaya çevirip sayıya dönüştür
         const benzinFiyati = parseFloat(fiyatString.replace(',', '.')); 
+        // ******* CHATGPT ÇÖZÜMÜ SONU *******
+
 
         if (isNaN(benzinFiyati) || benzinFiyati <= 0) {
              throw new Error(`Fiyat verisi geçersiz veya sıfır: ${fiyatString}`);
@@ -182,7 +189,7 @@ async function yukleYolUcretiVerilerini() {
     } catch (error) {
         console.error("Akaryakıt API Hatası:", error);
         
-        // Yedek sabit fiyatı kullanma
+        // API çekilemezse, yedek sabit fiyatı kullanma
         benzinFiyatlari.AVRUPA = YEDEK_BENZIN_FIYATI; 
         benzinFiyatlari.ANADOLU = YEDEK_BENZIN_FIYATI; 
         hesaplaYolUcretiBtn.disabled = false; 
@@ -216,7 +223,7 @@ function hesaplaYolUcreti() {
 
     let katsayi;
     let yakaAciklama;
-    const kullanilacakFiyat = benzinFiyatlari.AVRUPA; // Her iki yaka için referans fiyat
+    const kullanilacakFiyat = benzinFiyatlari.AVRUPA;
     
     if (ikamet === 'AVRUPA') {
         katsayi = 3.25;
@@ -226,7 +233,7 @@ function hesaplaYolUcreti() {
         yakaAciklama = "İstanbul (Anadolu Yakası) İkamet Katsayısı";
     }
 
-    const tekYonUcret = kullanilacakFiyasst * katsayi;
+    const tekYonUcret = kullanilacakFiyat * katsayi;
     const toplamHakEdis = tekYonUcret * yolSayisi; 
     
     const tekYonStr = tekYonUcret.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
