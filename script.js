@@ -2,13 +2,9 @@
 // ********* API VE HARCIRAH VERİ TABANI *********
 // **********************************************
 
-// YENİ: III. GRUP (En Sağdaki) DEĞERLERİNE GÖRE OLUŞTURULDU
 const harcirahVerileri = {
-    // Para Birimi: USD (ABD Doları)
+    // III. GRUP DEĞERLERİ BAZ ALINMIŞTIR
     "ABD": { deger: 60, birim: "USD", dovizAdi: "$" },
-    "DİĞER ÜLKELER": { deger: 52, birim: "USD", dovizAdi: "$" },
-
-    // Para Birimi: EUR (Euro)
     "AVUSTURYA": { deger: 55, birim: "EUR", dovizAdi: "€" },
     "ALMANYA": { deger: 54, birim: "EUR", dovizAdi: "€" },
     "BELÇİKA": { deger: 53, birim: "EUR", dovizAdi: "€" },
@@ -20,10 +16,8 @@ const harcirahVerileri = {
     "PORTEKİZ": { deger: 51, birim: "EUR", dovizAdi: "€" },
     "YUNANİSTAN": { deger: 52, birim: "EUR", dovizAdi: "€" },
     "İRLANDA": { deger: 52, birim: "EUR", dovizAdi: "€" },
-    "İSPANYA": { deger: 52, birim: "EUR", dovizAdi: "€" }, // Yeni eklenen İspanya
+    "İSPANYA": { deger: 52, birim: "EUR", dovizAdi: "€" },
     "DİĞER AB ÜLKELERİ": { deger: 42, birim: "EUR", dovizAdi: "€" },
-
-    // Diğer Para Birimleri
     "AVUSTRALYA": { deger: 93, birim: "AUD", dovizAdi: "A$" },
     "DANİMARKA": { deger: 408, birim: "DKK", dovizAdi: "kr" },
     "İSVEÇ": { deger: 447, birim: "SEK", dovizAdi: "kr" },
@@ -34,10 +28,10 @@ const harcirahVerileri = {
     "NORVEÇ": { deger: 393, birim: "NOK", dovizAdi: "kr" },
     "İNGİLTERE": { deger: 38, birim: "GBP", dovizAdi: "£" },
     "S.ARABİSTAN": { deger: 204, birim: "SAR", dovizAdi: "﷼" },
+    "DİĞER ÜLKELER": { deger: 52, birim: "USD", dovizAdi: "$" },
 };
 
 // DÖVİZ KURU API ENTEGRASYONU
-// LÜTFEN KENDİ ALDIĞINIZ API ANAHTARINI BURAYA YAPIŞTIRIN!
 const API_KEY = 'SİZİN_ALDIĞINIZ_API_ANAHTARI'; 
 const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
@@ -45,14 +39,12 @@ const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 let kurVerileri = {
     "USD": 0, "EUR": 0, "JPY": 0, "AUD": 0, "DKK": 0, 
     "SEK": 0, "CHF": 0, "CAD": 0, "KWD": 0, "NOK": 0, "GBP": 0, "SAR": 0,
-    // Varsayılan kurlar (Hata durumunda kullanılacak)
     "DEFAULT_USD": 30.00, "DEFAULT_EUR": 32.00, "DEFAULT_JPY": 0.20, 
     "DEFAULT_AUD": 18.00, "DEFAULT_DKK": 4.20, "DEFAULT_SEK": 3.00, 
     "DEFAULT_CHF": 34.00, "DEFAULT_CAD": 21.00, "DEFAULT_KWD": 98.00, 
     "DEFAULT_NOK": 2.90, "DEFAULT_GBP": 37.00, "DEFAULT_SAR": 8.00
 };
 
-// API'den kurları çeken asenkron fonksiyon
 async function kurlariGetir() {
     try {
         const response = await fetch(BASE_URL);
@@ -70,7 +62,6 @@ async function kurlariGetir() {
         }
     } catch (error) {
         console.error("Döviz Kuru API Hatası:", error);
-        // Hata durumunda varsayılan kurlar kullanılıyor.
         for (const birim in kurVerileri) {
             if (birim.length === 3 && kurVerileri[`DEFAULT_${birim}`]) {
                 kurVerileri[birim] = kurVerileri[`DEFAULT_${birim}`];
@@ -79,8 +70,6 @@ async function kurlariGetir() {
     }
 }
 
-
-// Ülke Seçimini dolduran fonksiyon
 function ulkeSecimleriniDoldur(selectElement) {
     if (!selectElement) return;
     
@@ -117,44 +106,37 @@ function ekleGirisAlani(canDelete = false) {
     `;
 
     if (canDelete) {
-        // Sil butonu eklendi, onclick event'i ile kendi div'ini siliyor
         html += `<button type="button" class="sil-btn" onclick="this.parentNode.remove()">X</button>`;
     } else {
-        // İlk satır için sil butonu boşluğunu korumak için boş div
         html += `<div style="width: 40px; flex-shrink: 0;"></div>`; 
     }
 
     div.innerHTML = html;
     konteyner.appendChild(div);
 
-    // Yeni select elementini doldur
     const selectElement = div.querySelector('.ulke-secimi');
     ulkeSecimleriniDoldur(selectElement);
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Kurları Getir (API Çağrısı)
     kurlariGetir();
-    
-    // 2. İlk Harcırah Giriş Satırını Ekle (Silme butonu olmadan)
     ekleGirisAlani(false);
 
-    // **********************************************
     // ********* SEKMELER ARASI GEÇİŞ MANTIĞI *********
-    // **********************************************
-    
     const tabCalismaBtn = document.getElementById('tabCalismaBtn');
     const tabHaricrahBtn = document.getElementById('tabHaricrahBtn');
     const tabDegerBtn = document.getElementById('tabDegerBtn'); 
-    
+    const tabYolUcretiBtn = document.getElementById('tabYolUcretiBtn');
+
     const calismaGunTab = document.getElementById('calismaGunTab');
     const haricrahTab = document.getElementById('haricrahTab');
     const degerHesaplayiciTab = document.getElementById('degerHesaplayiciTab');
+    const yolUcretiTab = document.getElementById('yolUcretiTab');
 
-    if (tabCalismaBtn && tabHaricrahBtn && calismaGunTab && haricrahTab && tabDegerBtn && degerHesaplayiciTab) {
-        const allTabs = [calismaGunTab, haricrahTab, degerHesaplayiciTab];
-        const allBtns = [tabCalismaBtn, tabHaricrahBtn, tabDegerBtn];
+    if (tabCalismaBtn && tabHaricrahBtn && calismaGunTab && haricrahTab && tabDegerBtn && degerHesaplayiciTab && tabYolUcretiBtn && yolUcretiTab) {
+        const allTabs = [calismaGunTab, haricrahTab, degerHesaplayiciTab, yolUcretiTab];
+        const allBtns = [tabCalismaBtn, tabHaricrahBtn, tabDegerBtn, tabYolUcretiBtn];
         
         const changeTab = (activeTab, activeBtn) => {
             allTabs.forEach(tab => tab.classList.add('hidden'));
@@ -162,18 +144,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             activeTab.classList.remove('hidden');
             activeBtn.classList.add('active');
+
+            if (activeBtn === tabYolUcretiBtn) {
+                yukleYolUcretiVerilerini();
+            }
         };
 
         tabCalismaBtn.addEventListener('click', () => changeTab(calismaGunTab, tabCalismaBtn));
         tabHaricrahBtn.addEventListener('click', () => changeTab(haricrahTab, tabHaricrahBtn));
         tabDegerBtn.addEventListener('click', () => changeTab(degerHesaplayiciTab, tabDegerBtn));
+        tabYolUcretiBtn.addEventListener('click', () => changeTab(yolUcretiTab, tabYolUcretiBtn));
     }
 
 
-    // ***************************************************
     // ********* 1. BOŞ GÜN HESAPLAYICISI MANTIĞI *********
-    // ***************************************************
-
     const bosGunTablosu = { 
         31: 8, 30: 8, 29: 8, 28: 7, 27: 7, 26: 7, 25: 7, 
         24: 6, 23: 6, 22: 6, 21: 6, 20: 5, 19: 5, 
@@ -189,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const standartBosGun = bosGunTablosu[30]; 
 
-    // Elementler
     const aySecimiSelect = document.getElementById('aySecimi');
     const izinGunInput = document.getElementById('izinGunSayisi');
     const hesaplaBtn = document.getElementById('hesaplaBtn');
@@ -249,10 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ***************************************************
     // ********* 2. HARCIRAH PLANLAYICISI MANTIĞI *********
-    // ***************************************************
-
     const motorKapamaZamaniInput = document.getElementById('motorKapamaZamani');
     const planlaHaricrahBtn = document.getElementById('planlaHaricrahBtn');
     const haricrahSonucDiv = document.getElementById('haricrahSonuc');
@@ -336,10 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         haricrahSonucDiv.classList.remove('error');
     }
 
-    // ***************************************************
     // ********* 3. HARCIRAH DEĞER HESAPLAYICISI MANTIĞI *********
-    // ***************************************************
-    
     const ekleBtn = document.getElementById('ekleBtn');
     const hesaplaDegerBtn = document.getElementById('hesaplaDegerBtn');
     const degerSonucDiv = document.getElementById('degerSonuc');
@@ -377,24 +354,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const paraBirimi = veri.birim;
             const dovizAdi = veri.dovizAdi;
             
-            // Kur bilgisini al
             let kur = kurVerileri[paraBirimi]; 
             if (!kur || kur === 0) {
                 kur = kurVerileri[`DEFAULT_${paraBirimi}`] || 1;
             }
             
-            // Hesaplamalar
             const totalOriginalTutar = tekilDeger * harcirahSayisi;
             const tlKarsiligi = totalOriginalTutar * kur;
             toplamTL += tlKarsiligi;
 
-            // Formatlama
             const kurBilgisiStr = kur.toFixed(4).replace('.', ','); 
             const tlKarsiligiStr = tlKarsiligi.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const tekilDegerStr = tekilDeger.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const totalOriginalTutarStr = totalOriginalTutar.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-            // Detay Çıktısı (Onaylanan Format)
             detayHTML += `
                 <div class="detay-hesaplama-kutusu">
                     <h4 style="color: #004d99; margin-top: 0; font-size: 1.2em;">${secilenUlke} İçin ${harcirahSayisi} Harcırah Değeri</h4>
@@ -424,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const toplamTLStr = toplamTL.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Nihai Çıktı Oluşturma
         let nihaiHTML = `
             <h3>DETAYLI HARCIRAH HESAPLAMASI</h3>
             ${detayHTML}
@@ -441,5 +413,123 @@ document.addEventListener('DOMContentLoaded', () => {
         
         degerSonucDiv.innerHTML = nihaiHTML;
         degerSonucDiv.classList.remove('error');
+    }
+    
+    // ********* 4. YOL ÜCRETİ HESAPLAYICISI MANTIĞI *********
+    
+    const YAKIT_API_URL = 'https://akaryakit-fiyatlari.vercel.app/api/po/34';
+    const ikametYeriSelect = document.getElementById('ikametYeri');
+    const hesaplaYolUcretiBtn = document.getElementById('hesaplaYolUcretiBtn');
+    const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
+
+    let benzinLitreFiyati = 0;
+    let sonGuncellemeTarihi = "Bilinmiyor";
+
+    async function yukleYolUcretiVerilerini() {
+        if (!yolUcretiSonucDiv || benzinLitreFiyati > 0) return; 
+
+        yolUcretiSonucDiv.innerHTML = "Güncel benzin fiyatı yükleniyor...";
+        yolUcretiSonucDiv.classList.remove('error');
+
+        try {
+            const response = await fetch(YAKIT_API_URL);
+            const data = await response.json();
+
+            if (data.status !== 200 || !data.data || data.data.length === 0) {
+                 throw new Error("API'den veri alınamadı.");
+            }
+            
+            const ilkIstasyon = data.data[0];
+            const benzinFiyatiStr = ilkIstasyon.prices["Benzin"];
+            
+            if (!benzinFiyatiStr) {
+                 throw new Error("Benzin fiyatı bulunamadı.");
+            }
+            
+            benzinLitreFiyati = parseFloat(benzinFiyatiStr.replace(',', '.'));
+            sonGuncellemeTarihi = ilkIstasyon.date || "Bilinmiyor";
+
+            yolUcretiSonucDiv.innerHTML = `
+                Güncel Benzin Fiyatı (95 Oktan): 
+                <strong style="color: #004d99; font-size: 1.2em;">${benzinLitreFiyati.toFixed(2).replace('.', ',')} TL/Litre</strong><br>
+                <span style="font-size: 0.8em; color: #666;">Güncelleme: ${sonGuncellemeTarihi}</span><br><br>
+                Lütfen ikamet yakanızı seçiniz ve hesaplayınız.
+            `;
+            
+            hesaplaYolUcretiBtn.disabled = false;
+
+
+        } catch (error) {
+            console.error("Yakıt API Hatası:", error);
+            yolUcretiSonucDiv.innerHTML = "Hata: Benzin fiyatı yüklenemedi. Hesaplama yapılamıyor.";
+            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+            hesaplaYolUcretiBtn.disabled = true;
+        }
+    }
+
+    if (hesaplaYolUcretiBtn) {
+        hesaplaYolUcretiBtn.addEventListener('click', hesaplaYolUcreti);
+        hesaplaYolUcretiBtn.disabled = true;
+    }
+
+    function hesaplaYolUcreti() {
+        if (benzinLitreFiyati === 0) {
+            yolUcretiSonucDiv.innerHTML = "Lütfen fiyat verisinin yüklenmesini bekleyin.";
+            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+            return;
+        }
+
+        const ikamet = ikametYeriSelect.value;
+        if (!ikamet) {
+            yolUcretiSonucDiv.innerHTML = "Lütfen ikamet yakanızı seçiniz.";
+            yolUcretiSonucDiv.className = 'sonuc-kutusu error';
+            return;
+        }
+
+        let katsayi;
+        let yakaAciklama;
+        
+        if (ikamet === 'AVRUPA') {
+            katsayi = 3.25;
+            yakaAciklama = "İstanbul (Avrupa Yakası) İkamet Katsayısı";
+        } else if (ikamet === 'ANADOLU') {
+            katsayi = 6.5;
+            yakaAciklama = "İstanbul (Anadolu Yakası) İkamet Katsayısı";
+        } else {
+            return;
+        }
+
+        const tekYonUcret = benzinLitreFiyati * katsayi;
+        const ciftYonUcret = tekYonUcret * 2;
+        
+        const tekYonStr = tekYonUcret.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const ciftYonStr = ciftYonUcret.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        yolUcretiSonucDiv.innerHTML = `
+            <div style="text-align: center;">
+                <h3 style="color: #004d99; margin-top: 0; font-size: 1.4em;">Yol Ücreti Hesaplama Sonucu</h3>
+                <p>
+                    <strong style="color:#666; font-size: 0.9em;">${yakaAciklama} (${katsayi} Katsayısı)</strong>
+                </p>
+                <p style="font-size: 1.1em;">
+                    Güncel Benzin Fiyatı: <strong>${benzinLitreFiyati.toFixed(2).replace('.', ',')} TL/Litre</strong>
+                </p>
+                
+                <hr style="border-top: 1px solid #ccc; width: 60%; margin: 15px auto;">
+                
+                <p style="font-size: 1.5em; color: #cc0000; margin-bottom: 5px;">
+                    Tek Yön Yol Ücreti: 
+                    <strong>${tekYonStr} TL</strong>
+                </p>
+                <p style="font-size: 1.2em; color: #008000; margin-top: 5px;">
+                    Gidiş-Dönüş (Çift Yön) Yol Ücreti: 
+                    <strong>${ciftYonStr} TL</strong>
+                </p>
+                <p style="font-size: 0.8em; color: #999; margin-top: 20px;">
+                    *Hesaplama: ${benzinLitreFiyati.toFixed(2).replace('.', ',')} TL × ${katsayi} Katsayısı
+                </p>
+            </div>
+        `;
+        yolUcretiSonucDiv.classList.remove('error');
     }
 });
