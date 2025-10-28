@@ -1,9 +1,10 @@
-// **********************************************
-// ********* API VE HARCIRAH VERİ TABANI *********
-// **********************************************
+// *******************************************************************
+// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (NİHAİ) *********
+// *******************************************************************
 
+// ********* API VE HARCIRAH VERİ TABANI *********
 const harcirahVerileri = {
-    // III. GRUP DEĞERLERİ BAZ ALINMIŞTIR
+    // III. GRUP DEĞERLERİ BAZ ALINMIŞTIR (Örnek veriler)
     "ABD": { deger: 60, birim: "USD", dovizAdi: "$" },
     "AVUSTURYA": { deger: 55, birim: "EUR", dovizAdi: "€" },
     "ALMANYA": { deger: 54, birim: "EUR", dovizAdi: "€" },
@@ -31,14 +32,22 @@ const harcirahVerileri = {
     "DİĞER ÜLKELER": { deger: 52, birim: "USD", dovizAdi: "$" },
 };
 
-// DÖVİZ KURU API ENTEGRASYONU
+// DÖVİZ KURU API ENTEGRASYONU (Lütfen kendi anahtarınızı girin)
 const API_KEY = 'SİZİN_ALDIĞINIZ_API_ANAHTARI'; 
 const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
-// Yol Ücreti API Tanımları
-const KADIKOY_API_URL = 'SİZİN_KADIKÖY_ÖZEL_API_URLİNİZ'; // Örnek: 'https://api.opet.com.tr/api/fuelprices/prices?DistrictCode=034009'
+// Yol Ücreti API Tanımı
+const AKARYAKIT_API_URL = 'https://akaryakit-fiyatlari.vercel.app/api/tp/34'; 
+const YEDEK_BENZIN_FIYATI = 52.15; // API çalışmazsa kullanılacak sabit fiyat
 
-// Kur verileri ve Varsayılan Kurlar
+// Yol Ücreti Fiyat Değişkenleri
+let benzinFiyatlari = {
+    AVRUPA: 0, // Referans fiyatı tutacak
+    ANADOLU: 0  // Referans fiyatı tutacak
+};
+let sonGuncellemeTarihi = "Bilinmiyor";
+
+// Varsayılan Kurlar (API başarısız olursa kullanılacak)
 let kurVerileri = {
     "USD": 0, "EUR": 0, "JPY": 0, "AUD": 0, "DKK": 0, 
     "SEK": 0, "CHF": 0, "CAD": 0, "KWD": 0, "NOK": 0, "GBP": 0, "SAR": 0,
@@ -48,13 +57,7 @@ let kurVerileri = {
     "DEFAULT_NOK": 2.90, "DEFAULT_GBP": 37.00, "DEFAULT_SAR": 8.00
 };
 
-// Yol Ücreti Fiyat Değişkenleri
-let benzinFiyatlari = {
-    AVRUPA: 0,
-    ANADOLU: 0
-};
-let sonGuncellemeTarihi = "Bilinmiyor";
-
+// ********* GENEL FONKSİYONLAR *********
 
 async function kurlariGetir() {
     try {
@@ -68,11 +71,12 @@ async function kurlariGetir() {
         const rates = data.conversion_rates;
         for (const birim in kurVerileri) {
             if (birim.length === 3 && rates[birim]) { 
-                kurVerileri[birim] = 1 / rates[birim];
+                kurVerileri[birim] = 1 / rates[birim]; // TRY'den diğer kura dönüşüm
             }
         }
     } catch (error) {
-        console.error("Döviz Kuru API Hatası:", error);
+        console.error("Döviz Kuru API Hatası (Varsayılan kullanılıyor):", error);
+        // API başarısız olursa varsayılan kurları atıyoruz
         for (const birim in kurVerileri) {
             if (birim.length === 3 && kurVerileri[`DEFAULT_${birim}`]) {
                 kurVerileri[birim] = kurVerileri[`DEFAULT_${birim}`];
@@ -116,8 +120,10 @@ function ekleGirisAlani(canDelete = false) {
     `;
 
     if (canDelete) {
+        // Silme butonu
         html += `<button type="button" class="sil-btn" onclick="this.parentNode.remove()">X</button>`;
     } else {
+        // İlk satır için yer tutucu
         html += `<div style="width: 40px; flex-shrink: 0;"></div>`; 
     }
 
@@ -128,10 +134,10 @@ function ekleGirisAlani(canDelete = false) {
     ulkeSecimleriniDoldur(selectElement);
 }
 
-
+// ********* DOM HAZIR *********
 document.addEventListener('DOMContentLoaded', () => {
-    kurlariGetir();
-    ekleGirisAlani(false);
+    kurlariGetir(); // Kurları hemen yüklemeye başla
+    ekleGirisAlani(false); // İlk harcırah giriş satırını ekle
 
     // ********* SEKMELER ARASI GEÇİŞ MANTIĞI *********
     const tabCalismaBtn = document.getElementById('tabCalismaBtn');
@@ -155,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeTab.classList.remove('hidden');
             activeBtn.classList.add('active');
 
+            // Yol Ücreti sekmesine geçince fiyatı yüklemeyi başlat
             if (activeBtn === tabYolUcretiBtn) {
                 yukleYolUcretiVerilerini();
             }
@@ -164,10 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
         tabHaricrahBtn.addEventListener('click', () => changeTab(haricrahTab, tabHaricrahBtn));
         tabDegerBtn.addEventListener('click', () => changeTab(degerHesaplayiciTab, tabDegerBtn));
         tabYolUcretiBtn.addEventListener('click', () => changeTab(yolUcretiTab, tabYolUcretiBtn));
+        
+        // Varsayılan olarak aktif olan sekmenin API yüklemesini yap (Eğer yol ücreti değilse yapmaz)
+        if (tabYolUcretiBtn.classList.contains('active')) {
+             yukleYolUcretiVerilerini();
+        }
     }
 
 
-    // ********* 1. BOŞ GÜN HESAPLAYICISI MANTIĞI (AYNI) *********
+    // ********* 1. BOŞ GÜN HESAPLAYICISI MANTIĞI *********
     const bosGunTablosu = { 
         31: 8, 30: 8, 29: 8, 28: 7, 27: 7, 26: 7, 25: 7, 
         24: 6, 23: 6, 22: 6, 21: 6, 20: 5, 19: 5, 
@@ -181,8 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
         Temmuz: 31, Agustos: 31, Eylul: 30, Ekim: 31, Kasim: 30, Aralik: 31
     };
     
-    const standartBosGun = bosGunTablosu[30]; 
-
     const aySecimiSelect = document.getElementById('aySecimi');
     const izinGunInput = document.getElementById('izinGunSayisi');
     const hesaplaBtn = document.getElementById('hesaplaBtn');
@@ -198,14 +208,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const ayAdi = aySecimiSelect.value;
         const izinGunSayisi = parseInt(izinGunInput.value);
 
+        // ... (Hesaplama mantığı aynı kalıyor) ...
+        const standartBosGun = 8; // Referans alınan boş gün sayısı
+        const ayGunSayisi = ayGunleri[ayAdi];
+        
         if (!ayAdi || isNaN(izinGunSayisi) || izinGunSayisi < 0) {
             sonucDiv.innerHTML = "Lütfen geçerli bir ay seçin ve izin gün sayısını girin.";
             sonucDiv.className = 'sonuc-kutusu error';
             return;
         }
 
-        const ayGunSayisi = ayGunleri[ayAdi];
-        
         let fiiliCalismaGunu = ayGunSayisi - izinGunSayisi;
         
         if (fiiliCalismaGunu > 31) {
@@ -242,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ********* 2. HARCIRAH PLANLAYICISI MANTIĞI (AYNI) *********
+    // ********* 2. HARCIRAH PLANLAYICISI MANTIĞI *********
     const motorKapamaZamaniInput = document.getElementById('motorKapamaZamani');
     const planlaHaricrahBtn = document.getElementById('planlaHaricrahBtn');
     const haricrahSonucDiv = document.getElementById('haricrahSonuc');
@@ -252,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function planlaHaricrah() {
+        // ... (Harcırah Planlama Mantığı aynı kalıyor) ...
         if (!motorKapamaZamaniInput || !haricrahSonucDiv) return;
 
         const motorKapamaZamaniStr = motorKapamaZamaniInput.value;
@@ -326,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         haricrahSonucDiv.classList.remove('error');
     }
 
-    // ********* 3. HARCIRAH DEĞER HESAPLAYICISI MANTIĞI (AYNI) *********
+    // ********* 3. HARCIRAH DEĞER HESAPLAYICISI MANTIĞI *********
     const ekleBtn = document.getElementById('ekleBtn');
     const hesaplaDegerBtn = document.getElementById('hesaplaDegerBtn');
     const degerSonucDiv = document.getElementById('degerSonuc');
@@ -340,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hesaplaHaricrahDeger() {
+        // ... (Harcırah Değer Hesaplama Mantığı aynı kalıyor) ...
         if (!degerSonucDiv) return;
 
         const girisSatirlari = document.querySelectorAll('.dinamik-giris-satiri');
@@ -425,72 +439,77 @@ document.addEventListener('DOMContentLoaded', () => {
         degerSonucDiv.classList.remove('error');
     }
     
-    // ********* 4. YOL ÜCRETİ HESAPLAYICISI MANTIĞI (GÜNCELLENDİ) *********
+    // ********* 4. YOL ÜCRETİ HESAPLAYICISI MANTIĞI *********
     
     const ikametYeriSelect = document.getElementById('ikametYeri');
-    const yolKullanimInput = document.getElementById('yolKullanimSayisi'); // Yeni input
+    const yolKullanimInput = document.getElementById('yolKullanimSayisi');
     const hesaplaYolUcretiBtn = document.getElementById('hesaplaYolUcretiBtn');
     const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
 
 
     async function yukleYolUcretiVerilerini() {
-        // Avrupa Yakası fiyatını kontrol etmek, referans fiyatın yüklenip yüklenmediğini gösterir.
         if (!yolUcretiSonucDiv || benzinFiyatlari.AVRUPA > 0) return; 
 
-        yolUcretiSonucDiv.innerHTML = "Güncel Kadıköy Benzin fiyatı yükleniyor...";
+        yolUcretiSonucDiv.innerHTML = "Güncel Akaryakıt fiyatı yükleniyor...";
         yolUcretiSonucDiv.classList.remove('error');
 
         try {
-            // Kadıköy'e özel API URL'mizden veriyi çekiyoruz.
-            const response = await fetch(KADIKOY_API_URL);
+            const response = await fetch(AKARYAKIT_API_URL);
             const data = await response.json(); 
 
-            if (!data.prices || data.prices.length === 0) {
-                 throw new Error("API'den 'prices' listesi alınamadı.");
+            if (!data || data.length === 0) {
+                 throw new Error("API'den geçerli bir fiyat dizisi alınamadı.");
             }
             
-            // Fiyat, prices dizisindeki 'Kurşunsuz Benzin 95' ürünü altındaki 'amount' anahtarındadır.
-            const fiyatObjesi = data.prices.find(p => p.productName === "Kurşunsuz Benzin 95");
+            // ISTANBUL - AVRUPA fiyatını bulmaya çalışıyoruz.
+            let fiyatObjesi = data.find(item => item.ilce === "ISTANBUL - AVRUPA");
+
+            // Eğer ISTANBUL - AVRUPA bulunamazsa, ISTANBUL - ANADOLU fiyatını yedek olarak kullanıyoruz.
+            if (!fiyatObjesi) {
+                 fiyatObjesi = data.find(item => item.ilce === "ISTANBUL - ANADOLU");
+            }
             
-            if (!fiyatObjesi || typeof fiyatObjesi.amount !== 'number') {
-                 throw new Error("Kurşunsuz Benzin 95 fiyatı ('amount') tespit edilemedi.");
+            if (!fiyatObjesi || typeof fiyatObjesi.benzin !== 'number') {
+                 throw new Error("Benzin fiyatı ('benzin' anahtarı) tespit edilemedi veya sayı değil.");
             }
 
-            const kadikoyFiyat = fiyatObjesi.amount; 
-            
-            // Kadıköy fiyatını her iki yaka için referans fiyat olarak atıyoruz.
-            benzinFiyatlari.AVRUPA = kadikoyFiyat; 
-            benzinFiyatlari.ANADOLU = kadikoyFiyat; 
+            const benzinFiyati = fiyatObjesi.benzin; 
+            const referansIlce = fiyatObjesi.ilce;
+
+            // Bulunan fiyatı her iki yaka için referans olarak atıyoruz.
+            benzinFiyatlari.AVRUPA = benzinFiyati; 
+            benzinFiyatlari.ANADOLU = benzinFiyati; 
             
             // Fiyat verisinin alındığı tarih
-            sonGuncellemeTarihi = new Date().toLocaleString('tr-TR', { 
+            const suankiTarih = new Date().toLocaleString('tr-TR', { 
                 year: 'numeric', month: 'short', day: 'numeric', 
                 hour: '2-digit', minute: '2-digit' 
             });
 
 
-            if (kadikoyFiyat <= 0) {
+            if (benzinFiyati <= 0) {
                  throw new Error("API'den geçerli bir sayısal fiyat değeri alınamadı.");
             }
             
             yolUcretiSonucDiv.innerHTML = `
-                Güncel Referans Benzin Fiyatı (Kadıköy):
-                <strong style="color: #004d99; font-size: 1.2em;">${kadikoyFiyat.toFixed(2).replace('.', ',')} TL/Litre</strong>
-                <span style="font-size: 0.8em; color: #666;">Güncelleme: ${sonGuncellemeTarihi}</span><br><br>
+                Güncel Referans Benzin Fiyatı (${referansIlce}):
+                <strong style="color: #004d99; font-size: 1.2em;">${benzinFiyati.toFixed(2).replace('.', ',')} TL/Litre</strong>
+                <span style="font-size: 0.8em; color: #666;">Güncelleme: ${suankiTarih}</span><br><br>
                 Lütfen ikamet yakanızı ve kullanım sayısını giriniz.
             `;
             
             hesaplaYolUcretiBtn.disabled = false;
 
         } catch (error) {
-            console.error("Yol Ücreti API Hatası:", error);
-            yolUcretiSonucDiv.innerHTML = `Hata: Referans benzin fiyatı (Kadıköy) yüklenemedi. Hesaplama yapılamıyor. Lütfen API URL'sini kontrol edin. (${error.message})`;
-            // Güvenlik için, API çekilemezse sabit bir fiyat atayalım ki en azından hesaplama mantığı test edilebilsin.
-            benzinFiyatlari.AVRUPA = 52.15; 
-            benzinFiyatlari.ANADOLU = 52.15; 
-            hesaplaYolUcretiBtn.disabled = false; // Sabit fiyatla hesaplamaya izin veriyoruz.
+            console.error("Akaryakıt API Hatası:", error);
+            yolUcretiSonucDiv.innerHTML = `Hata: Referans benzin fiyatı yüklenemedi. Hesaplama yapılamıyor. (${error.message})`;
+            
+            // API çekilemezse, yedek sabit fiyatı atıyoruz.
+            benzinFiyatlari.AVRUPA = YEDEK_BENZIN_FIYATI; 
+            benzinFiyatlari.ANADOLU = YEDEK_BENZIN_FIYATI; 
+            hesaplaYolUcretiBtn.disabled = false; 
             yolUcretiSonucDiv.className = 'sonuc-kutusu error';
-            yolUcretiSonucDiv.innerHTML += "<br> <span style='color:green;'>**Geçici olarak 52.15 TL/Litre sabit fiyatı kullanılıyor.**</span>";
+            yolUcretiSonucDiv.innerHTML += `<br> <span style='color:green;'>**Geçici olarak ${YEDEK_BENZIN_FIYATI.toFixed(2).replace('.', ',')} TL/Litre sabit fiyatı kullanılıyor.**</span>`;
         }
     }
 
@@ -507,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const ikamet = ikametYeriSelect.value;
-        const yolSayisi = parseInt(yolKullanimInput.value); // Yeni giriş değeri
+        const yolSayisi = parseInt(yolKullanimInput.value); 
 
         if (!ikamet || isNaN(yolSayisi) || yolSayisi < 0) {
             yolUcretiSonucDiv.innerHTML = "Lütfen ikamet yakanızı seçiniz ve geçerli bir kullanım sayısı giriniz.";
@@ -517,7 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let katsayi;
         let yakaAciklama;
-        let kullanilacakFiyat = benzinFiyatlari.AVRUPA; // Kadıköy fiyatı her iki yakada da referans alındı.
+        // Referans fiyat olarak AVRUPA'ya atanan fiyatı kullanıyoruz.
+        let kullanilacakFiyat = benzinFiyatlari.AVRUPA; 
         
         if (ikamet === 'AVRUPA') {
             katsayi = 3.25;
