@@ -24,7 +24,7 @@ body {
 /* Başlıklar ve Açıklamalar */
 h1 {
     text-align: center;
-    color: #004d99; /*  Mavi */
+    color: #004d99; /* Kurumsal Mavi */
     margin-bottom: 10px;
     font-size: 1.8em;
 }
@@ -62,7 +62,7 @@ select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 6px; /* Köşeleri Yuvarlama */
+    border-radius: 6px; 
     box-sizing: border-box;
     font-size: 16px;
     transition: border-color 0.3s;
@@ -73,15 +73,36 @@ input:focus, select:focus {
     outline: none;
 }
 
+/* Dinamik Harcırah Giriş Alanları Stili */
+.dinamik-giris-satiri {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.dinamik-giris-satiri .select-wrapper,
+.dinamik-giris-satiri .input-wrapper {
+    flex-grow: 1;
+}
+
+.dinamik-giris-satiri .input-wrapper {
+    flex-grow: 0.4;
+    min-width: 80px;
+}
+
+.dinamik-giris-satiri label {
+    display: none; /* Etiketler, yan yana formda gizleniyor */
+}
 
 /* Butonlar */
 button {
     width: 100%;
     padding: 12px;
-    background-color: #ff9900; /* Turuncu (Boş Gün varsayılan) */
+    background-color: #ff9900; 
     color: white;
     border: none;
-    border-radius: 6px; /* Köşeleri Yuvarlama */
+    border-radius: 6px; 
     cursor: pointer;
     font-size: 1.1em;
     font-weight: bold;
@@ -101,6 +122,36 @@ button:hover {
 #planlaHaricrahBtn:hover, #hesaplaDegerBtn:hover {
     background-color: #003a73;
 }
+
+/* Küçük Mavi Buton (Ekleme Butonu) */
+.mavi-btn-kucuk {
+    width: auto !important;
+    padding: 8px 15px;
+    background-color: #008000; /* Yeşil Ekleme Butonu */
+    font-size: 0.9em;
+    font-weight: normal;
+    float: right;
+}
+
+.mavi-btn-kucuk:hover {
+    background-color: #006600;
+}
+
+/* Silme Butonu */
+.sil-btn {
+    width: 40px !important;
+    padding: 10px 0;
+    background-color: #cc0000;
+    margin-top: 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+.sil-btn:hover {
+    background-color: #990000;
+}
+
 
 /* Sonuç Kutusu */
 .sonuc-kutusu {
@@ -129,7 +180,43 @@ button:hover {
     text-align: center;
 }
 
-/* Tablo Stilleri (Harcırah) */
+/* Harcırah Değer Detay Sonuçları Stili */
+.detay-sonuc h3 {
+    color: #004d99;
+    margin-top: 0;
+    font-size: 1.4em;
+    border-bottom: 2px dashed #004d99;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.detay-hesaplama-kutusu {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    background-color: #ffffff;
+    text-align: left;
+}
+
+.genel-toplam {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #004d99;
+    color: white;
+    font-size: 1.8em;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.kur-listesi {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Tablo Stilleri (Harcırah Planlayıcı İçin) */
 .sonuc-kutusu table {
     width: 100%;
     border-collapse: collapse;
