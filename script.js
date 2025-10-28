@@ -550,4 +550,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <hr style="border-top: 1px solid #ccc; width: 60%; margin: 15px auto;">
 
                 <p style="font-size: 1.3em; color: #cc0000; margin-bottom: 5px;">
-                    Tek Yön Yol Ü
+                    Tek Yön Yol Ücreti Hak Edişi: 
+                    <strong>${tekYonStr} TL</strong>
+                </p>
+                
+                <p style="font-size: 1.7em; color: #008000; margin-top: 15px;">
+                    Toplam Hak Edilen Yol Ücreti (${yolSayisi} Yol): 
+                    <strong>${toplamHakEdisStr} TL</strong>
+                </p>
+                
+                <p style="font-size: 0.8em; color: #999; margin-top: 20px;">
+                    *Hesaplama: ${fiyatStr} TL × ${katsayi} Katsayısı × ${yolSayisi} Yol
+                </p>
+            </div>
+        `;
+        yolUcretiSonucDiv.classList.remove('error');
+    }
+});
