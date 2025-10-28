@@ -24,7 +24,7 @@ body {
 /* Başlıklar ve Açıklamalar */
 h1 {
     text-align: center;
-    color: #004d99; /* Kurumsal Mavi */
+    color: #004d99;
     margin-bottom: 10px;
     font-size: 1.8em;
 }
@@ -73,11 +73,12 @@ input:focus, select:focus {
     outline: none;
 }
 
-/* YENİ: Başlık Etiketleri Stili (Hizalama Referansı) */
+/* Başlık Etiketleri Stili */
 .giris-basliklari {
     display: flex;
     gap: 10px;
     margin-bottom: 8px; 
+    padding-right: 50px;
 }
 
 .giris-basliklari label {
@@ -88,7 +89,7 @@ input:focus, select:focus {
     font-size: 0.9em;
 }
 
-/* Dinamik Harcırah Giriş Alanları Stili */
+/* Dinamik Giriş Alanları Stili */
 .dinamik-giris-satiri {
     display: flex;
     gap: 10px; 
@@ -96,7 +97,7 @@ input:focus, select:focus {
     margin-bottom: 15px;
 }
 
-/* Ülke Seçim Kutusuna ve Başlığa Genişlik Verilmesi */
+/* Ülke Seçim Kutusuna Genişlik Verilmesi */
 .dinamik-giris-satiri .select-wrapper {
     flex-grow: 1;
 }
@@ -105,35 +106,18 @@ input:focus, select:focus {
     flex-grow: 1;
 }
 
-
-/* Sayı Kutusu ve Başlığı İçin Sabit Genişlik (Genişlik Daha Da Artırıldı) */
+/* Sayı Kutusu ve Başlığı İçin Sabit Genişlik */
 .dinamik-giris-satiri .input-wrapper,
 .giris-basliklari .sayi-label {
     flex-grow: 0;
-    width: 220px; /* Yeni sabit genişlik (170px) */
+    width: 220px;
     min-width: 220px; 
 }
 
 .dinamik-giris-satiri label {
-    display: none; /* Dinamik satır içindeki etiketleri gizle */
+    display: none;
 }
 
-/* HİZALAMA DÜZELTMESİ (Genişlik değişse bile bu değeri ayarlamamız gerekir) */
-.giris-basliklari {
-    /* Sil butonu (40px) + Elemanlar arası boşluk (10px) = 50px */
-    padding-right: 50px; 
-}
-
-.dinamik-giris-satiri label {
-    display: none; /* Dinamik satır içindeki etiketleri gizle */
-}
-
-/* YENİ HİZALAMA DÜZELTMESİ */
-/* Başlık alanının, giriş satırlarıyla aynı genişliğe sahip olması için 
-   silme butonu genişliği kadar sağdan boşluk bırakıyoruz */
-.giris-basliklari {
-    padding-right: 50px; /* Sil butonu (40px) + 10px boşluk = 50px */
-}
 
 /* Butonlar */
 button {
@@ -154,20 +138,20 @@ button:hover {
     background-color: #e68a00;
 }
 
-/* Harcırah Planlayıcı/Değer Butonları için Mavi Ton */
-#planlaHaricrahBtn, #hesaplaDegerBtn {
+/* Harcırah ve Yol Ücreti Butonları için Mavi Ton */
+#planlaHaricrahBtn, #hesaplaDegerBtn, #hesaplaYolUcretiBtn {
     background-color: #004d99;
 }
 
-#planlaHaricrahBtn:hover, #hesaplaDegerBtn:hover {
+#planlaHaricrahBtn:hover, #hesaplaDegerBtn:hover, #hesaplaYolUcretiBtn:hover {
     background-color: #003a73;
 }
 
-/* Küçük Mavi Buton (Ekleme Butonu) */
+/* Ekleme Butonu */
 .mavi-btn-kucuk {
     width: auto !important;
     padding: 8px 15px;
-    background-color: #008000; /* Yeşil Ekleme Butonu */
+    background-color: #008000;
     font-size: 0.9em;
     font-weight: normal;
     float: right;
@@ -186,7 +170,7 @@ button:hover {
     font-size: 1.1em;
     font-weight: bold;
     border-radius: 6px;
-    flex-shrink: 0; /* Genişlemesini engelle */
+    flex-shrink: 0;
 }
 
 .sil-btn:hover {
