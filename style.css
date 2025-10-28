@@ -106,17 +106,19 @@ input:focus, select:focus {
 }
 
 
-/* Sayı Kutusu ve Başlığı İçin Sabit Genişlik (Genişlik Artırıldı) */
+/* Sayı Kutusu ve Başlığı İçin Sabit Genişlik (Genişlik Daha Da Artırıldı) */
 .dinamik-giris-satiri .input-wrapper,
 .giris-basliklari .sayi-label {
     flex-grow: 0;
-    width: 150px; /* Yeni sabit genişlik (Örn: 150px) */
-    min-width: 150px; 
+    width: 170px; /* Yeni sabit genişlik (170px) */
+    min-width: 170px; 
 }
 
-/* YENİ HİZALAMA DÜZELTMESİ (Genişlik değiştiği için bu da değişmeli) */
-/* Başlık alanının, giriş satırlarıyla aynı genişliğe sahip olması için 
-   silme butonu genişliği kadar sağdan boşluk bırakıyoruz */
+.dinamik-giris-satiri label {
+    display: none; /* Dinamik satır içindeki etiketleri gizle */
+}
+
+/* HİZALAMA DÜZELTMESİ (Genişlik değişse bile bu değeri ayarlamamız gerekir) */
 .giris-basliklari {
     /* Sil butonu (40px) + Elemanlar arası boşluk (10px) = 50px */
     padding-right: 50px; 
