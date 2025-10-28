@@ -158,7 +158,7 @@ async function yukleYolUcretiVerilerini() {
         
         // HEDEF ANAHTAR: API'den gelen kaçış karakterli (escaped) anahtarı kullanıyoruz:
         // Bu düzeltme, API'nin "TL\/lt" olarak gönderdiği dizeyi doğru yakalamayı sağlar.
-        const hedefAnahtar = "Kursunsuz_95(Excellium95)_TL\\/lt";
+        const hedefAnahtar = "Kursunsuz_95(Excellium95)_TL/lt";
         
         // Fiyat dizesini al, yoksa yedek fiyatı kullan
         let fiyatString = fiyatData?.[hedefAnahtar] || YEDEK_BENZIN_FIYATI.toString();
