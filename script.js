@@ -425,29 +425,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let benzinLitreFiyati = 0;
     let sonGuncellemeTarihi = "Bilinmiyor";
 
-    async function yukleYolUcretiVerilerini() {
-        if (!yolUcretiSonucDiv || benzinLitreFiyati > 0) return; 
-
-        yolUcretiSonucDiv.innerHTML = "Güncel benzin fiyatı yükleniyor...";
-        yolUcretiSonucDiv.classList.remove('error');
+async function yukleYolUcretiVerilerini() {
+        // ... (Kodun başlangıcı aynı) ...
 
         try {
             const response = await fetch(YAKIT_API_URL);
             const data = await response.json();
 
             if (data.status !== 200 || !data.data || data.data.length === 0) {
-                 throw new Error("API'den veri alınamadı.");
+                 throw new Error("API'den veri alınamadı veya status 200 değil.");
             }
             
             const ilkIstasyon = data.data[0];
-            const benzinFiyatiStr = ilkIstasyon.prices["Benzin"];
+            
+            // BURAYI DİKKATLE KONTROL EDİN:
+            // API'den dönen anahtarın (Örn: "Benzin", "Kurşunsuz 95", "Kurşunsuz") ne olduğuna bağlı olarak değiştirin.
+            const FIYAT_ANAHTARI = "Benzin"; 
+            
+            const benzinFiyatiStr = ilkIstasyon.prices[FIYAT_ANAHTARI];
             
             if (!benzinFiyatiStr) {
-                 throw new Error("Benzin fiyatı bulunamadı.");
+                 // Eğer fiyat gelmezse, hata mesajını gösterir.
+                 throw new Error(`Benzin fiyatı ('${FIYAT_ANAHTARI}') API'de bulunamadı. Lütfen anahtarı kontrol edin.`);
             }
             
+            // API'den gelen string değeri (Örn: "38,50") parseFloat ile sayıya çeviriyoruz.
             benzinLitreFiyati = parseFloat(benzinFiyatiStr.replace(',', '.'));
             sonGuncellemeTarihi = ilkIstasyon.date || "Bilinmiyor";
+
+            // ... (Kalan kod aynı) ...
+        } catch (error) {
+            // ... (Hata bloğu aynı) ...
+        }
+    }
 
             yolUcretiSonucDiv.innerHTML = `
                 Güncel Benzin Fiyatı (95 Oktan): 
