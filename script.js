@@ -2,49 +2,50 @@
 // ********* API VE HARCIRAH VERİ TABANI *********
 // **********************************************
 
-// Sizin sağladığınız tabloya göre oluşturulan harcırah değerleri (tekil harcırah tutarları)
+// YENİ: III. GRUP (En Sağdaki) DEĞERLERİNE GÖRE OLUŞTURULDU
 const harcirahVerileri = {
     // Para Birimi: USD (ABD Doları)
-    "ABD": { deger: 74, birim: "USD", dovizAdi: "$" },
-    "DİĞER ÜLKELER": { deger: 64, birim: "USD", dovizAdi: "$" },
+    "ABD": { deger: 60, birim: "USD", dovizAdi: "$" },
+    "DİĞER ÜLKELER": { deger: 52, birim: "USD", dovizAdi: "$" },
 
     // Para Birimi: EUR (Euro)
-    "AVUSTURYA": { deger: 68, birim: "EUR", dovizAdi: "€" },
-    "ALMANYA": { deger: 67, birim: "EUR", dovizAdi: "€" },
-    "BELÇİKA": { deger: 66, birim: "EUR", dovizAdi: "€" },
-    "LÜKSEMBURG": { deger: 66, birim: "EUR", dovizAdi: "€" },
-    "FİNLANDİYA": { deger: 60, birim: "EUR", dovizAdi: "€" },
-    "FRANSA": { deger: 65, birim: "EUR", dovizAdi: "€" },
-    "HOLLANDA": { deger: 64, birim: "EUR", dovizAdi: "€" },
-    "İTALYA": { deger: 62, birim: "EUR", dovizAdi: "€" },
-    "PORTEKİZ": { deger: 63, birim: "EUR", dovizAdi: "€" },
-    "YUNANİSTAN": { deger: 64, birim: "EUR", dovizAdi: "€" },
-    "İRLANDA": { deger: 63, birim: "EUR", dovizAdi: "€" },
-    "DİĞER AB ÜLKELERİ": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "AVUSTURYA": { deger: 55, birim: "EUR", dovizAdi: "€" },
+    "ALMANYA": { deger: 54, birim: "EUR", dovizAdi: "€" },
+    "BELÇİKA": { deger: 53, birim: "EUR", dovizAdi: "€" },
+    "LÜKSEMBURG": { deger: 54, birim: "EUR", dovizAdi: "€" },
+    "FİNLANDİYA": { deger: 48, birim: "EUR", dovizAdi: "€" },
+    "FRANSA": { deger: 53, birim: "EUR", dovizAdi: "€" },
+    "HOLLANDA": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "İTALYA": { deger: 50, birim: "EUR", dovizAdi: "€" },
+    "PORTEKİZ": { deger: 51, birim: "EUR", dovizAdi: "€" },
+    "YUNANİSTAN": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "İRLANDA": { deger: 52, birim: "EUR", dovizAdi: "€" },
+    "İSPANYA": { deger: 52, birim: "EUR", dovizAdi: "€" }, // Yeni eklenen İspanya
+    "DİĞER AB ÜLKELERİ": { deger: 42, birim: "EUR", dovizAdi: "€" },
 
     // Diğer Para Birimleri
-    "AVUSTRALYA": { deger: 115, birim: "AUD", dovizAdi: "A$" },
-    "DANİMARKA": { deger: 505, birim: "DKK", dovizAdi: "kr" },
-    "İSVEÇ": { deger: 553, birim: "SEK", dovizAdi: "kr" },
-    "İSVİÇRE": { deger: 74, birim: "CHF", dovizAdi: "CHF" },
-    "JAPONYA": { deger: 8680, birim: "JPY", dovizAdi: "¥" },
-    "KANADA": { deger: 100, birim: "CAD", dovizAdi: "C$" },
-    "KUVEYT": { deger: 21, birim: "KWD", dovizAdi: "KD" },
-    "NORVEÇ": { deger: 486, birim: "NOK", dovizAdi: "kr" },
-    "İNGİLTERE": { deger: 47, birim: "GBP", dovizAdi: "£" },
-    "S.ARABİSTAN": { deger: 252, birim: "SAR", dovizAdi: "﷼" },
+    "AVUSTRALYA": { deger: 93, birim: "AUD", dovizAdi: "A$" },
+    "DANİMARKA": { deger: 408, birim: "DKK", dovizAdi: "kr" },
+    "İSVEÇ": { deger: 447, birim: "SEK", dovizAdi: "kr" },
+    "İSVİÇRE": { deger: 60, birim: "CHF", dovizAdi: "CHF" },
+    "JAPONYA": { deger: 7000, birim: "JPY", dovizAdi: "¥" },
+    "KANADA": { deger: 81, birim: "CAD", dovizAdi: "C$" },
+    "KUVEYT": { deger: 16, birim: "KWD", dovizAdi: "KD" },
+    "NORVEÇ": { deger: 393, birim: "NOK", dovizAdi: "kr" },
+    "İNGİLTERE": { deger: 38, birim: "GBP", dovizAdi: "£" },
+    "S.ARABİSTAN": { deger: 204, birim: "SAR", dovizAdi: "﷼" },
 };
 
-// YENİ: DÖVİZ KURU API ENTEGRASYONU
+// DÖVİZ KURU API ENTEGRASYONU
 // LÜTFEN KENDİ ALDIĞINIZ API ANAHTARINI BURAYA YAPIŞTIRIN!
 const API_KEY = 'SİZİN_ALDIĞINIZ_API_ANAHTARI'; 
 const BASE_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TRY`;
 
-// Kur verilerini çekeceğimiz ve saklayacağımız obje
+// Kur verileri ve Varsayılan Kurlar
 let kurVerileri = {
     "USD": 0, "EUR": 0, "JPY": 0, "AUD": 0, "DKK": 0, 
     "SEK": 0, "CHF": 0, "CAD": 0, "KWD": 0, "NOK": 0, "GBP": 0, "SAR": 0,
-    // Hata durumunda kullanılacak varsayılan kurlar
+    // Varsayılan kurlar (Hata durumunda kullanılacak)
     "DEFAULT_USD": 30.00, "DEFAULT_EUR": 32.00, "DEFAULT_JPY": 0.20, 
     "DEFAULT_AUD": 18.00, "DEFAULT_DKK": 4.20, "DEFAULT_SEK": 3.00, 
     "DEFAULT_CHF": 34.00, "DEFAULT_CAD": 21.00, "DEFAULT_KWD": 98.00, 
@@ -63,12 +64,10 @@ async function kurlariGetir() {
 
         const rates = data.conversion_rates;
         for (const birim in kurVerileri) {
-            if (birim.length === 3 && rates[birim]) { // Sadece 3 harfli kur kodlarını al
+            if (birim.length === 3 && rates[birim]) { 
                 kurVerileri[birim] = 1 / rates[birim];
             }
         }
-        console.log("Güncel Kurlar yüklendi:", kurVerileri);
-
     } catch (error) {
         console.error("Döviz Kuru API Hatası:", error);
         // Hata durumunda varsayılan kurlar kullanılıyor.
@@ -77,19 +76,16 @@ async function kurlariGetir() {
                 kurVerileri[birim] = kurVerileri[`DEFAULT_${birim}`];
             }
         }
-        console.log("Varsayılan kurlar kullanılıyor (Hata Durumu).");
     }
 }
 
 
-// YENİ: ÜLKE SEÇİMİNİ DOLDURAN FONKSİYON
+// Ülke Seçimini dolduran fonksiyon
 function ulkeSecimleriniDoldur(selectElement) {
     if (!selectElement) return;
     
-    // Varsayılan seçenek
     let html = '<option value="">-- Ülke Seçiniz --</option>';
 
-    // Harcirah verilerindeki ülkeleri alıp option olarak ekliyoruz
     Object.keys(harcirahVerileri).sort().forEach(ulke => {
         html += `<option value="${ulke}">${ulke} (${harcirahVerileri[ulke].birim})</option>`;
     });
@@ -97,7 +93,7 @@ function ulkeSecimleriniDoldur(selectElement) {
     selectElement.innerHTML = html;
 }
 
-// YENİ: DİNAMİK GİRİŞ ALANI EKLEME FONKSİYONU
+// DİNAMİK GİRİŞ ALANI EKLEME FONKSİYONU
 let satirId = 0;
 function ekleGirisAlani(canDelete = false) {
     const konteyner = document.getElementById('harcirahGirisleri');
@@ -116,12 +112,16 @@ function ekleGirisAlani(canDelete = false) {
         </div>
         <div class="input-wrapper">
             <label for="sayi_${satirId}">Harcırah Sayısı:</label>
-            <input type="number" class="harcirah-sayisi" id="sayi_${satirId}" placeholder="Harcırah Sayısı" min="1" required value="1">
+            <input type="number" class="harcirah-sayisi" id="sayi_${satirId}" min="1" required value="1">
         </div>
     `;
 
     if (canDelete) {
+        // Sil butonu eklendi, onclick event'i ile kendi div'ini siliyor
         html += `<button type="button" class="sil-btn" onclick="this.parentNode.remove()">X</button>`;
+    } else {
+        // İlk satır için sil butonu boşluğunu korumak için boş div
+        html += `<div style="width: 40px; flex-shrink: 0;"></div>`; 
     }
 
     div.innerHTML = html;
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let detayHTML = '';
         let hataVar = false;
 
-        girisSatirlari.forEach((satir, index) => {
+        girisSatirlari.forEach((satir) => {
             const ulkeSelect = satir.querySelector('.ulke-secimi');
             const sayiInput = satir.querySelector('.harcirah-sayisi');
 
@@ -397,8 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Detay Çıktısı (Onaylanan Format)
             detayHTML += `
                 <div class="detay-hesaplama-kutusu">
-                    <h4 style="color: #004d99; margin-top: 0;">${secilenUlke} İçin ${harcirahSayisi} Harcırah Değeri</h4>
-                    <p style="font-size: 1.1em; margin-bottom: 5px;">
+                    <h4 style="color: #004d99; margin-top: 0; font-size: 1.2em;">${secilenUlke} İçin ${harcirahSayisi} Harcırah Değeri</h4>
+                    <p style="font-size: 1.1em; margin-bottom: 5px; color:#333;">
                         Orijinal Tutar: 
                         <strong>${totalOriginalTutarStr} ${dovizAdi}</strong> 
                         <span style="font-size:0.8em; color:#666;">(${tekilDegerStr}${dovizAdi} x ${harcirahSayisi})</span>
@@ -407,8 +407,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         Güncel Kur (${paraBirimi}/TL): 
                         1 ${paraBirimi} = <strong>${kurBilgisiStr} TL</strong>
                     </p>
-                    <hr style="border-top: 1px solid #ccc; width: 50%; margin: 10px auto;">
-                    <p style="font-size: 1.6em; color: #cc0000; font-weight: bold; margin: 0;">
+                    <hr style="border-top: 1px solid #ddd; width: 70%; margin: 10px auto;">
+                    <p class="toplam-tl">
                         Toplam TL Karşılığı: 
                         ${tlKarsiligiStr} TL
                     </p>
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             <div class="genel-toplam">
                 <p style="margin: 0; font-weight: normal; font-size: 0.7em;">TOPLAM ALINACAK HARCIRAH</p>
-                <p style="margin: 5px 0 0 0;">${toplamTLStr} TL</p>
+                <strong style="margin: 5px 0 0 0;">${toplamTLStr} TL</strong>
             </div>
             
             <p style="font-size: 0.8em; color: #999; margin-top: 20px; text-align: center;">
