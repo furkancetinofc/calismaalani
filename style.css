@@ -110,8 +110,8 @@ input:focus, select:focus {
 .dinamik-giris-satiri .input-wrapper,
 .giris-basliklari .sayi-label {
     flex-grow: 0;
-    width: 170px; /* Yeni sabit genişlik (170px) */
-    min-width: 170px; 
+    width: 200px; /* Yeni sabit genişlik (170px) */
+    min-width: 200px; 
 }
 
 .dinamik-giris-satiri label {
