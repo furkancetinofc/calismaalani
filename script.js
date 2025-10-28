@@ -1,5 +1,5 @@
 // *******************************************************************
-// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (V3 - API HATA DÜZELTMELİ) *********
+// ********* UÇUCU EKİP HESAPLAYICILARI - script.js (V3.1 - TEMİZLİK DÜZELTMESİ) *********
 // *******************************************************************
 
 // ********* 1. API VE SABİT VERİ TANIMLARI *********
@@ -126,7 +126,7 @@ function ekleGirisAlani(canDelete = false) {
 }
 
 
-// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI (API HATA DÜZELTMELİ) *********
+// ********* 3. YOL ÜCRETİ HESAPLAYICISI FONKSİYONLARI (AGRESİF TEMİZLİK) *********
 
 async function yukleYolUcretiVerilerini() {
     const yolUcretiSonucDiv = document.getElementById('yolUcretiSonuc');
@@ -155,9 +155,15 @@ async function yukleYolUcretiVerilerini() {
         
         const fiyatData = dataObj[firstKey]; 
         
-        // API'deki kaçış karakterli (escaped) anahtarı kullanıyoruz: TL\/lt
-        const fiyatString = fiyatData?.["Kursunsuz_95(Excellium95)_TL\\/lt"] || YEDEK_BENZIN_FIYATI.toString();
-
+        // HEDEF ANAHTAR: API'den gelen kaçış karakterli (escaped) anahtarı kullanıyoruz:
+        const hedefAnahtar = "Kursunsuz_95(Excellium95)_TL\\/lt";
+        
+        // Fiyat dizesini al, yoksa yedek fiyatı kullan
+        let fiyatString = fiyatData?.[hedefAnahtar] || YEDEK_BENZIN_FIYATI.toString();
+        
+        // Fiyat dizesini temizle: Baştaki/sondaki boşlukları kaldır
+        fiyatString = fiyatString.trim(); 
+        
         // Virgülü noktaya çevirip sayıya dönüştür
         const benzinFiyati = parseFloat(fiyatString.replace(',', '.')); 
 
